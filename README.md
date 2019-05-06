@@ -1,8 +1,11 @@
 # aiobitcoin
 
 ![](https://img.shields.io/pypi/v/aiobitcoin.svg?style=flat)
+![](https://img.shields.io/pypi/pyversions/Django.svg)
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE)
 
 [![Documentation Status](https://readthedocs.org/projects/aiobitcoin/badge/?version=latest)](http://aiobitcoin.readthedocs.io/?badge=latest)
+[![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://GitHub.com/Naereen/StrapDown.js/issues/)
 
 This is a simple library that provides methods for working 
 with Bitcoin daemon JSON-RPC.
