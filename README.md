@@ -6,6 +6,7 @@
 
 [![Documentation Status](https://readthedocs.org/projects/aiobitcoin/badge/?version=latest)](http://aiobitcoin.readthedocs.io/?badge=latest)
 [![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://GitHub.com/Naereen/StrapDown.js/issues/)
+[![HitCount](http://hits.dwyl.com/mkbeh/aiobitcoin.svg)](http://hits.dwyl.com/mkbeh/aiobitcoin)
 
 This is a simple library that provides methods for working 
 with Bitcoin daemon JSON-RPC.
