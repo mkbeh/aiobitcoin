@@ -186,3 +186,10 @@ class GramBitcoin:
         )['result']
 
         return banned_lst if to_list else (el for el in banned_lst)
+
+    async def clear_banned(self):
+        """
+        Clear all banned IPs.
+        :return: None
+        """
+        await self._call_method('clearbanned')
