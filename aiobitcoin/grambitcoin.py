@@ -7,8 +7,7 @@ from asyncio.futures import TimeoutError
 from aiohttp.client_exceptions import ContentTypeError, InvalidURL, ServerDisconnectedError
 
 from . import bitcointools
-from .bitcoinerrors import InvalidPrivateKeyEncoding, PrivateKeyForThisAddressAlreadyInWallet, InvalidAddress, \
-    NoConnectionToTheDaemon
+from .bitcoinerrors import *
 
 
 class GramBitcoin:
@@ -158,3 +157,22 @@ class GramBitcoin:
         )['result']
 
         return peers_info if to_list else (peer_info for peer_info in peers_info)
+
+    async def set_ban(self, subnet: str, command: str = 'add',
+                      bantime: int = 0, absolute: bool = False) -> None or InvalidIpOrSubnet:
+        """
+        Attempts to add or remove an IP/Subnet from the banned list.
+        :param subnet: The IP/Subnet (see getpeerinfo for nodes IP) with an optional netmask
+        (default is /32 = single IP)
+        :param command: 'add' to add an IP/Subnet to the list, 'remove' to remove an IP/Subnet from the list
+        :param bantime: Time in seconds how long (or until when if [absolute] is set) the IP is banned
+        (0 or empty means using the default time of 24h which can also be overwritten by the -bantime startup argument)
+        :param absolute: If set, the bantime must be an absolute timestamp in seconds since epoch (Jan 1 1970 GMT)
+        :return:
+        """
+        error = (
+            await self._call_method('setban', subnet, command, bantime, absolute)
+        )['error']
+
+        if error and error['code'] == -30:
+            raise InvalidIpOrSubnet

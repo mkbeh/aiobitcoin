@@ -17,6 +17,10 @@ class InvalidAddress(BitcoinErrors):
     pass
 
 
+class InvalidIpOrSubnet(BitcoinErrors):
+    pass
+
+
 class NoConnectionToTheDaemon(BitcoinErrors):
     pass
 
