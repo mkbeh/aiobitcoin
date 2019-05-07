@@ -168,7 +168,7 @@ class GramBitcoin:
         :param bantime: Time in seconds how long (or until when if [absolute] is set) the IP is banned
         (0 or empty means using the default time of 24h which can also be overwritten by the -bantime startup argument)
         :param absolute: If set, the bantime must be an absolute timestamp in seconds since epoch (Jan 1 1970 GMT)
-        :return:
+        :return: None
         """
         error = (
             await self._call_method('setban', subnet, command, bantime, absolute)
@@ -179,6 +179,7 @@ class GramBitcoin:
 
     async def list_banned(self, to_list: bool = True) -> list or not list:
         """
+        :param to_list:
         :return: List all banned IPs/Subnets.
         """
         banned_lst = (
@@ -187,14 +188,14 @@ class GramBitcoin:
 
         return banned_lst if to_list else (el for el in banned_lst)
 
-    async def clear_banned(self):
+    async def clear_banned(self) -> None:
         """
         Clear all banned IPs.
         :return: None
         """
         await self._call_method('clearbanned')
 
-    async def ping(self):
+    async def ping(self) -> None:
         """
         Requests that a ping be sent to all other nodes, to measure ping time.
         Results provided in getpeerinfo, pingtime and pingwait fields are decimal seconds.
@@ -204,7 +205,10 @@ class GramBitcoin:
         """
         await self._call_method('ping')
 
-    async def get_network_info(self):
+    async def get_network_info(self) -> dict:
+        """
+        :return: Returns an object containing various state info regarding P2P networking.
+        """
         return (
             await self._call_method('getnetworkinfo')
         )['result']
