@@ -203,3 +203,8 @@ class GramBitcoin:
         :return: None
         """
         await self._call_method('ping')
+
+    async def get_network_info(self):
+        return (
+            await self._call_method('getnetworkinfo')
+        )['result']

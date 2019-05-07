@@ -10,7 +10,7 @@
 This is a simple library that provides methods for working 
 with Bitcoin daemon JSON-RPC.
 
-`NOTE: this lib works successful with Bitcoin Core == `
+`NOTE: this lib works successful with Bitcoin Core 0.17.1`
 
 ## Quickstart
 ### Create gram object and get blockchain info and balance:
