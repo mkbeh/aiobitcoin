@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 
 setup(
     name='aiobitcoin',
-    version='0.37.1',
+    version='0.5.2',
     description='Bitcoin lib for working with Bitcoin RPC.',
     author='mkbeh',
     author_email='mkbehforever@gmail.com',
