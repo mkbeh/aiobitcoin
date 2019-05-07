@@ -176,3 +176,13 @@ class GramBitcoin:
 
         if error and error['code'] == -30:
             raise InvalidIpOrSubnet
+
+    async def list_banned(self, to_list: bool = True) -> list or not list:
+        """
+        :return: List all banned IPs/Subnets.
+        """
+        banned_lst = (
+            await self._call_method('listbanned')
+        )['result']
+
+        return banned_lst if to_list else (el for el in banned_lst)
