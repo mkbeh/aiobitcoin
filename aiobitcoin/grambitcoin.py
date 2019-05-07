@@ -147,3 +147,14 @@ class GramBitcoin:
             return list_txs
 
         return (tx for tx in list_txs)
+
+    async def get_peer_info(self, to_list: bool = True) -> list or not list:
+        """
+        :param to_list: will return list or genexpr
+        :return: Returns data about each connected network node as a json array of objects.
+        """
+        peers_info = (
+            await self._call_method('getpeerinfo')
+        )['result']
+
+        return peers_info if to_list else (peer_info for peer_info in peers_info)

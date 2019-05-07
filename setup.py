@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aiobitcoin',
-    version='0.3.5',
+    version='0.30.5',
     description='Bitcoin lib for working with Bitcoin RPC.',
     author='mkbeh',
     author_email='mkbehforever@gmail.com',
