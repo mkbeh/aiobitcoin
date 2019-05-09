@@ -11,9 +11,9 @@ from .bitcoinerrors import *
 
 
 class GramBitcoin:
-    def __init__(self, url):
+    def __init__(self, url, read_timeout=20):
         self._url = url
-        self._session = aiohttp.ClientSession(read_timeout=20, json_serialize=ujson.dumps)
+        self._session = aiohttp.ClientSession(read_timeout=read_timeout, json_serialize=ujson.dumps)
 
     async def __aenter__(self):
         return self
