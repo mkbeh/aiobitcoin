@@ -48,6 +48,14 @@ class GramBitcoin:
             await self._call_method('getblockchaininfo')
         )['result']
 
+    async def get_block_count(self) -> int:
+        """
+        :return: Returns the number of blocks in the longest blockchain.
+        """
+        return (
+            await self._call_method('getblockcount')
+        )['result']
+
     async def import_address(self, addr: str, rescan: bool = False) -> None or PrivateKeyForThisAddressAlreadyInWallet:
         """
         Adds an address or script (in hex) that can be watched as if it were in your wallet but cannot be used to spend.
