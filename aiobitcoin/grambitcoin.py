@@ -42,19 +42,17 @@ class GramBitcoin:
         return url
 
     async def call_method(self, method, *args):
-        headers = {
-            'Content-Type': 'application/json',
-        }
+        headers = {'Content-Type': 'application/json'}
         data = {'jsonrpc': '1.0', 'method': f'{method}', 'params': args}
 
         try:
             response = await self.session.post(url=self.url, headers=headers, data=ujson.dumps(data))
-
-            return await response.json()
         except (ContentTypeError, InvalidURL, ServerDisconnectedError, TimeoutError):
             await self.close_session()
             logging.critical('No connection to the daemon.')
             raise NoConnectionToTheDaemon
+        else:
+            return await response.json()
 
     async def close_session(self):
         await self.session.close()
