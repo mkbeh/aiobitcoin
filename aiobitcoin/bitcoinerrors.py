@@ -23,5 +23,11 @@ class InvalidIpOrSubnet(BitcoinErrors):
 
 
 class NoConnectionToTheDaemon(BitcoinErrors):
-    pass
+    def __init__(self):
+        super().__init__(error_msg='No connection to the daemon.')
+
+
+class IncorrectCreds(BitcoinErrors):
+    def __init__(self, uri):
+        super().__init__(error_msg=f'RPC on {uri} is alive, but RPC credentials are incorrect.')
 

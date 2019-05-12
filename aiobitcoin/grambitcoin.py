@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import logging
 import aiohttp
 import ujson
 
@@ -47,12 +46,16 @@ class GramBitcoin:
 
         try:
             response = await self.session.post(url=self.url, headers=headers, data=ujson.dumps(data))
-        except (ContentTypeError, InvalidURL, ServerDisconnectedError, TimeoutError):
+        except (ServerDisconnectedError, TimeoutError):
             await self.close_session()
-            logging.critical('No connection to the daemon.')
             raise NoConnectionToTheDaemon
+        except InvalidURL:
+            raise InvalidURL(url=self.url)
         else:
-            return await response.json()
+            try:
+                return await response.json()
+            except ContentTypeError:
+                raise IncorrectCreds(uri=self.url)
 
     async def close_session(self):
         await self.session.close()
