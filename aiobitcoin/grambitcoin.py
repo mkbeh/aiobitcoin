@@ -48,7 +48,7 @@ class GramBitcoin:
             response = await self.session.post(url=self.url, headers=headers, data=ujson.dumps(data))
         except (ServerDisconnectedError, TimeoutError):
             await self.close_session()
-            raise NoConnectionToTheDaemon
+            raise NoConnectionToTheDaemon(f'No connection to the daemon {self.url}.')
         except ClientConnectorError:
             raise NoConnectionToTheDaemon(f'Cannot connect to host {self.url}.')
         except InvalidURL:
