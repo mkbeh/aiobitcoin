@@ -23,8 +23,8 @@ class InvalidIpOrSubnet(BitcoinErrors):
 
 
 class NoConnectionToTheDaemon(BitcoinErrors):
-    def __init__(self):
-        super().__init__(error_msg='No connection to the daemon.')
+    def __init__(self, error_msg='No connection to the daemon.'):
+        super().__init__(error_msg=error_msg)
 
 
 class IncorrectCreds(BitcoinErrors):

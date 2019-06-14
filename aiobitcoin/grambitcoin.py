@@ -3,7 +3,7 @@ import aiohttp
 import ujson
 
 from asyncio.futures import TimeoutError
-from aiohttp.client_exceptions import ContentTypeError, InvalidURL, ServerDisconnectedError
+from aiohttp.client_exceptions import ContentTypeError, InvalidURL, ServerDisconnectedError, ClientConnectorError
 
 from .bitcoinerrors import *
 
@@ -49,6 +49,8 @@ class GramBitcoin:
         except (ServerDisconnectedError, TimeoutError):
             await self.close_session()
             raise NoConnectionToTheDaemon
+        except ClientConnectorError:
+            raise NoConnectionToTheDaemon(f'Cannot connect to host {self.url}.')
         except InvalidURL:
             raise InvalidURL(url=self.url)
         else:
