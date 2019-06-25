@@ -41,6 +41,7 @@ General
 
    installation
    quickstart
+   examples
    api
 
 

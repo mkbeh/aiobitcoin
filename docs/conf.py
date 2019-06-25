@@ -24,7 +24,7 @@ copyright = '2019, mkbeh'
 author = 'mkbeh'
 
 # The short X.Y version
-version = ''
+version = 'latest'
 # The full version, including alpha/beta/rc tags
 release = 'latest'
 

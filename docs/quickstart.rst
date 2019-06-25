@@ -1,41 +1,38 @@
 Quickstart
 ----------
 
-Create gram object and get blockchain info:
-"""""""""""""""""""""""""""""""""""""""""""""""
+**Create `Blockchain` object and get some info:**
 ::
 
     import asyncio
-    from aiobitcoin.grambitcoin import GramBitcoin
+    from aiobitcoin.blockchain import Blockchain
 
 
     async def foo():
-        gram = GramBitcoin(url='<your_daemon_url_with_rpcuser_and_rpcwd>')
-        info = await gram.get_blockchain_info()
-        balance = await gram.get_balance()
-        print(info)
-        print(balance)
-
-        await gram.close_session()
-
+        blockchain = Blockchain(url='http://alice:bob@127.0.0.1:18332')
+        difficulty = await blockchain.get_difficulty()
+        block_count = await blockchain.get_block_count()
+        print(difficulty)
+        print(block_count)
+        await blockchain.close_session()
 
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(foo())
 
-or use the same with context manager:
-"""""""""""""""""""""""""""""""""""""""""
+**or use the same with context manager:**
+
 ::
 
     import asyncio
-    from aiobitcoin.grambitcoin import GramBitcoin
+    from aiobitcoin.blockchain import Blockchain
 
 
     async def foo():
-        async with GramBitcoin(url='<your_daemon_url_with_rpcuser_and_rpcwd>') as gram:
-            info = await gram.get_blockchain_info()
-            balance = await gram.get_balance()
-            print(info)
-            print(balance)
+        async with Blockchain(url='http://alice:bob@127.0.0.1:18332') as blockchain:
+            difficulty = await blockchain.get_difficulty()
+            block_count = await blockchain.get_block_count()
+            print(difficulty)
+            print(block_count)
 
 
     ioloop = asyncio.get_event_loop()
