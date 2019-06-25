@@ -10,7 +10,7 @@
 This is a simple library that provides methods for working 
 with Bitcoin/forks daemon JSON-RPC.
 
-[Read full documentation here.](https://aiobitcoin.readthedocs.io/en/latest/)
+[Read full documentation with examples here.](https://aiobitcoin.readthedocs.io/en/latest/)
 
 `NOTE #0: this lib works successful with Bitcoin Core 0.17.1 , 
 other wallet versions not tested.`
