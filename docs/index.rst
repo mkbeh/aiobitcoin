@@ -48,7 +48,7 @@ Package
 .. toctree::
    :maxdepth: 4
 
-   source/aiobitcoin
+   aiobitcoin
 
 Indices and tables
 ==================
