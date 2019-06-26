@@ -26,8 +26,8 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['aiohttp', 'ujson']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+# MOCK_MODULES = ['aiohttp', 'ujson']
+# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
 # -- Project information -----------------------------------------------------
