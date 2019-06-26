@@ -16,3 +16,4 @@ python:
   install:
     - method: setuptools
     - package: aiobitcoin
+    - requirements: requirements.txt
