@@ -9,14 +9,6 @@ aiobitcoin.grambitcoin module
     :undoc-members:
     :show-inheritance:
 
-aiobitcoin.bitcoinerrors module
--------------------------------
-
-.. automodule:: aiobitcoin.bitcoinerrors
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 aiobitcoin.blockchain module
 ----------------------------
 
@@ -45,6 +37,14 @@ aiobitcoin.wallet module
 ------------------------
 
 .. automodule:: aiobitcoin.wallet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+aiobitcoin.bitcoinerrors module
+-------------------------------
+
+.. automodule:: aiobitcoin.bitcoinerrors
     :members:
     :undoc-members:
     :show-inheritance:
