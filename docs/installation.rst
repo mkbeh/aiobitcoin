@@ -1,13 +1,12 @@
 Installation
 ------------
-Installation
-""""""""""""
-Install with pip:
+
+**Install with pip:**
 ::
 
     pip3 install aiobitcoin
 
-Install manually:
+**Install manually:**
 ::
 
     git clone https://github.com/mkbeh/aiobitcoin
