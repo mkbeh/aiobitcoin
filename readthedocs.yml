@@ -15,5 +15,4 @@ python:
   version: 3.6
   install:
     - method: setuptools
-    - package: aiobitcoin
       path: .
