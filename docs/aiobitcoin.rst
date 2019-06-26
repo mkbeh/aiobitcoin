@@ -6,7 +6,6 @@ aiobitcoin.grambitcoin
 
 .. automodule:: aiobitcoin.grambitcoin
     :members:
-    :undoc-members:
     :show-inheritance:
 
 aiobitcoin.blockchain
