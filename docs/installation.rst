@@ -13,9 +13,7 @@ Installation
     cd aiobitcoin
     python3 setup.py install install --user
 
-Upgrade
-"""""""
-
+**Upgrade**
 ::
 
     pip3 install aiobitcoin --user --upgrade
