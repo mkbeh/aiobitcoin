@@ -1,7 +1,7 @@
 API
 ==================
 
-aiobitcoin.grambitcoin module
+aiobitcoin.grambitcoin
 -----------------------------
 
 .. automodule:: aiobitcoin.grambitcoin
@@ -9,7 +9,7 @@ aiobitcoin.grambitcoin module
     :undoc-members:
     :show-inheritance:
 
-aiobitcoin.blockchain module
+aiobitcoin.blockchain
 ----------------------------
 
 .. automodule:: aiobitcoin.blockchain
@@ -17,7 +17,7 @@ aiobitcoin.blockchain module
     :undoc-members:
     :show-inheritance:
 
-aiobitcoin.network module
+aiobitcoin.network
 -------------------------
 
 .. automodule:: aiobitcoin.network
@@ -25,7 +25,7 @@ aiobitcoin.network module
     :undoc-members:
     :show-inheritance:
 
-aiobitcoin.util module
+aiobitcoin.util
 ----------------------
 
 .. automodule:: aiobitcoin.util
@@ -33,7 +33,7 @@ aiobitcoin.util module
     :undoc-members:
     :show-inheritance:
 
-aiobitcoin.wallet module
+aiobitcoin.wallet
 ------------------------
 
 .. automodule:: aiobitcoin.wallet
@@ -41,7 +41,7 @@ aiobitcoin.wallet module
     :undoc-members:
     :show-inheritance:
 
-aiobitcoin.bitcoinerrors module
+aiobitcoin.bitcoinerrors
 -------------------------------
 
 .. automodule:: aiobitcoin.bitcoinerrors
