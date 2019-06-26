@@ -5,8 +5,7 @@ aiobitcoin.grambitcoin
 -----------------------------
 
 .. automodule:: aiobitcoin.grambitcoin
-    :members:
-    :show-inheritance:
+
 
 aiobitcoin.blockchain
 ----------------------------
