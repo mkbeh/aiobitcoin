@@ -42,8 +42,13 @@ General
    installation
    quickstart
    examples
-   api
 
+Package
+-------
+.. toctree::
+   :maxdepth: 4
+
+   source/aiobitcoin
 
 Indices and tables
 ==================

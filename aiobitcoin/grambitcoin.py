@@ -9,6 +9,22 @@ from .bitcoinerrors import *
 
 
 class GramBitcoin:
+    """
+    This class is needed to create a session and then transfer the class
+    instance with already active session to other classes , in order to
+    avoid creating multiple sessions. RPC-API https://bitcoincore.org/en/doc/0.17.0/
+
+    :param str url (optional):                      Node URI in format http://alice:bob@127.0.0.1:18332
+    :param int read_timeout (20):                   Request operations timeout
+    :param object session_required (optional):      Will create session or not
+
+    Important note:
+    if you create an instance of this class, then you need to pass the
+    session_required parameter with the value True. It is not necessary to pass
+    the url parameter, if you do not pass it, then do not forget to pass the url
+    to other classes to which you intend to pass an object of this class.
+    """
+
     def __init__(self, url=None, read_timeout=20, session_required=False):
         self.url = url
         self._session_required = session_required

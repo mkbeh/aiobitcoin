@@ -37,6 +37,26 @@ Examples
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(foo())
 
+**Another way to usage:**
+::
+
+    import asyncio
+    from aiobitcoin.grambitcoin import GramBitcoin
+    from aiobitcoin.blockchain import Blockchain
+
+
+    async def baz():
+        # Create gram objects.
+        gram = GramBitcoin(session_required=True)
+
+        # Get some single info.
+        blockchain = Blockchain(url='http://alice:bob@127.0.0.1:18332', gram=gram)
+        result = await blockchain.get_block_count()
+        print(result)
+
+        # Close sessions.
+        await gram.close_session()
+
 **How to call methods asynchronously:**
 ::
 
