@@ -9,7 +9,7 @@ https://www.secg.org/sec1-v2.pdf
 
 from typing import Union
 from hashlib import sha256
-# from .curve import Curve, Point
+from .curve import Curve, Point
 
 
 # bytes or hex string
@@ -34,6 +34,26 @@ def double_sha256(o: Octets) -> bytes:
         o = bytes.fromhex(o)
 
     return sha256(sha256(o).digest()).digest()
+
+
+def octets_from_point(ec: Curve, Q: Point, compressed: bool) -> bytes:
+    """Return a point as compressed/uncompressed octet sequence.
+
+    Return a point as compressed (0x02, 0x03) or uncompressed (0x04)
+    octet sequence, according to SEC 1 v.2, section 2.3.3.
+    """
+
+    # check that Q is a point and that is on curve
+    ec.require_on_curve(Q)
+
+    if Q[1] == 0:  # infinity point in affine coordinates
+        return b'\x00'
+
+    bPx = Q[0].to_bytes(ec.psize, byteorder='big')
+    if compressed:
+        return (b'\x03' if (Q[1] & 1) else b'\x02') + bPx
+
+    return b'\x04' + bPx + Q[1].to_bytes(ec.psize, byteorder='big')
 
 
 # def point_from_octets(ec: Curve, o: Octets) -> Point:

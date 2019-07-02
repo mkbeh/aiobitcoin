@@ -3,7 +3,9 @@ from hmac import HMAC
 from hashlib import sha512
 
 from . import base58
-from .utils import Octets, int_from_octets
+from .curve import mult
+from .curves import secp256k1 as ec
+from .utils import Octets, int_from_octets, octets_from_point
 
 
 # VERSION BYTES =      4 bytes     Base58 encode starts with
@@ -11,6 +13,22 @@ MAINNET_PRV = b'\x04\x88\xAD\xE4'  # xprv
 TESTNET_PRV = b'\x04\x35\x83\x94'  # tprv
 SEGWIT_PRV = b'\x04\xb2\x43\x0c'
 PRV = [MAINNET_PRV, TESTNET_PRV, SEGWIT_PRV]
+
+MAINNET_PUB = b'\x04\x88\xB2\x1E'  # xpub
+TESTNET_PUB = b'\x04\x35\x87\xCF'  # tpub
+SEGWIT_PUB = b'\x04\xb2\x47\x46'
+PUB = [MAINNET_PUB, TESTNET_PUB, SEGWIT_PUB]
+
+MAINNET_ADDRESS = b'\x00'          # 1
+TESTNET_ADDRESS = b'\x6F'          # m or n
+ADDRESS = [MAINNET_ADDRESS, TESTNET_ADDRESS]
+
+# [  : 4] version
+# [ 4: 5] depth
+# [ 5: 9] parent pubkey fingerprint
+# [ 9:13] child index
+# [13:45] chain code
+# [45:78] key (private/public)
 
 
 def xmprv_from_seed(seed: Octets, version: Octets) -> bytes:
@@ -37,3 +55,30 @@ def xmprv_from_seed(seed: Octets, version: Octets) -> bytes:
     xmprv += b'\x00' + mprv.to_bytes(32, 'big')   # private key
 
     return base58.encode_check(xmprv)
+
+
+def xpub_from_xprv(xprv: Octets) -> bytes:
+    """Neutered Derivation (ND)
+
+    Computation of the extended public key corresponding to an extended
+    private key (“neutered” as it removes the ability to sign transactions)
+    """
+
+    xprv = base58.decode_check(xprv, 78)
+    if xprv[45] != 0:
+        raise ValueError("extended key is not a private one")
+
+    i = PRV.index(xprv[:4])
+
+    # serialization data
+    xpub = PUB[i]                              # version
+    # unchanged serialization data
+    xpub += xprv[4: 5]                         # depth
+    xpub += xprv[5: 9]                         # parent pubkey fingerprint
+    xpub += xprv[9:13]                         # child index
+    xpub += xprv[13:45]                        # chain code
+
+    p = int_from_octets(xprv[46:])
+    P = mult(ec, p)
+    xpub += octets_from_point(ec, P, True)          # public key
+    return base58.encode_check(xpub)

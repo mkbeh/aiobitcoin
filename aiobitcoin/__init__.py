@@ -6,4 +6,5 @@ __all__ = [
     'util',
     'bitcoinerrors',
     'mnemonic',
+    'tools'
 ]
