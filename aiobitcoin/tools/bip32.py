@@ -12,16 +12,16 @@ from .utils import Octets, int_from_octets, octets_from_point
 MAINNET_PRV = b'\x04\x88\xAD\xE4'  # xprv
 TESTNET_PRV = b'\x04\x35\x83\x94'  # tprv
 SEGWIT_PRV = b'\x04\xb2\x43\x0c'
-PRV = [MAINNET_PRV, TESTNET_PRV, SEGWIT_PRV]
+PRV = (MAINNET_PRV, TESTNET_PRV, SEGWIT_PRV)
 
 MAINNET_PUB = b'\x04\x88\xB2\x1E'  # xpub
 TESTNET_PUB = b'\x04\x35\x87\xCF'  # tpub
 SEGWIT_PUB = b'\x04\xb2\x47\x46'
-PUB = [MAINNET_PUB, TESTNET_PUB, SEGWIT_PUB]
+PUB = (MAINNET_PUB, TESTNET_PUB, SEGWIT_PUB)
 
 MAINNET_ADDRESS = b'\x00'          # 1
 TESTNET_ADDRESS = b'\x6F'          # m or n
-ADDRESS = [MAINNET_ADDRESS, TESTNET_ADDRESS]
+ADDRESS = (MAINNET_ADDRESS, TESTNET_ADDRESS)
 
 # [  : 4] version
 # [ 4: 5] depth
