@@ -4,5 +4,6 @@ __all__ = [
     'network',
     'wallet',
     'util',
-    'bitcoinerrors'
+    'bitcoinerrors',
+    'mnemonic',
 ]
