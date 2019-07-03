@@ -24,6 +24,7 @@ setup(
         'typing-extensions==3.7.2',
         'ujson==1.35',
         'yarl==1.3.0',
+        'pycrypto==2.6.1'
     ],
     packages=find_packages()
 )
