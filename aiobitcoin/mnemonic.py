@@ -17,6 +17,7 @@ class Mnemonic:
 
         """
         self._wordlist = []
+
         with open(os.path.join(WORDLIST_DIR, '%s.txt' % language)) as f:
             self._wordlist = [w.strip() for w in f.readlines()]
 
@@ -31,9 +32,11 @@ class Mnemonic:
         :return str: Checksum of key in bits
         """
         data = to_bytes(data)
+
         if len(data) % 4 > 0:
             raise ValueError('Data length in bits should be divisible by 32, but it is not (%d bytes = %d bits).' %
                              (len(data), len(data) * 8))
+
         tx_hash = hashlib.sha256(data).digest()
         return change_base(tx_hash, 256, 2, 256)[:len(data) * 8 // 32]
 
@@ -53,16 +56,19 @@ class Mnemonic:
         """
         data = to_bytes(data)
         data_int = change_base(data, 256, 10)
+
         if check_on_curve and not 0 < data_int < secp256k1_n:
             raise ValueError("Integer value of data should be in secp256k1 domain between 1 and secp256k1_n-1")
+
         if add_checksum:
             binresult = change_base(data_int, 10, 2, len(data) * 8) + self.checksum(data)
             wi = change_base(binresult, 2, 2048)
         else:
             wi = change_base(data_int, 10, 2048)
+
         return normalize_string(' '.join([self._wordlist[i] for i in wi]))
 
-    def generate(self, strength=128, add_checksum=True):
+    def generate(self, strength=128, add_checksum=True, encoding=True):
         """
         Generate a random Mnemonic key
 
@@ -78,5 +84,8 @@ class Mnemonic:
         """
         if strength % 32 > 0:
             raise ValueError("Strenght should be divisible by 32")
+
         data = os.urandom(strength // 8)
-        return self.to_mnemonic(data, add_checksum=add_checksum)
+        ceed = self.to_mnemonic(data, add_checksum=add_checksum)
+
+        return ceed.encode('utf-8') if encoding else ceed
