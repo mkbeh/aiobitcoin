@@ -20,9 +20,11 @@ def netcode_and_type_lookup_for_data(data):
     prefixes = network_prefixes()
     sizes = set(len(p) for p in prefixes)
     d = {}
+
     for length in sizes:
         for netcode, the_type in prefixes.get(data[:length], []):
             d[netcode] = (the_type, length)
+
     return d
 
 
@@ -35,10 +37,13 @@ def netcode_and_type_for_data(data, netcodes=None):
     May also raise EncodingError if no prefix found.
     """
     d = netcode_and_type_lookup_for_data(data)
+
     if netcodes is None:
         netcodes = network_codes()
+
     for netcode in netcodes:
         v = d.get(netcode)
+
         if v:
             return netcode, v[0], v[1]
 
@@ -57,6 +62,7 @@ def netcode_and_type_for_text(text, netcodes=None):
         }
         as_bin = h2b(text)
         l = len(as_bin)
+
         if l in LENGTH_LOOKUP:
             return None, LENGTH_LOOKUP[l], as_bin
     except (binascii.Error, TypeError):
@@ -67,8 +73,10 @@ def netcode_and_type_for_text(text, netcodes=None):
         decoded = convertbits(data[1:], 5, 8, False)
         script = bin_script([int2byte(data[0]), b''.join(int2byte(d) for d in decoded)])
         l = bech32_prefixes().get(hrp, [])
+
         if netcodes is None:
             netcodes = network_codes()
+
         for netcode in netcodes:
             if netcode in l:
                 return netcode, "segwit", script
@@ -77,6 +85,7 @@ def netcode_and_type_for_text(text, netcodes=None):
 
     data = encoding.a2b_hashed_base58(text)
     netcode, the_type, length = netcode_and_type_for_data(data, netcodes=netcodes)
+
     return netcode, the_type, data[length:]
 
 
@@ -85,10 +94,12 @@ def _check_against(text, expected_type, allowable_netcodes):
         allowable_netcodes = network_codes()
     try:
         netcode, the_type, data = netcode_and_type_for_text(text, netcodes=allowable_netcodes)
+
         if the_type in expected_type and netcode in allowable_netcodes:
             return netcode
     except encoding.EncodingError:
         pass
+
     return None
 
 

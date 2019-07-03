@@ -23,22 +23,30 @@ class ScriptMultisig(ScriptType):
     @classmethod
     def from_script(cls, script):
         pc = 0
+
         if len(script) == 0:
             raise ValueError("blank script")
+
         opcode, data, pc = tools.get_opcode(script, pc)
 
         if not opcodes.OP_1 <= opcode < opcodes.OP_16:
             raise ValueError("m value invalid")
+
         m = opcode + (1 - opcodes.OP_1)
         sec_keys = []
+
         while 1:
             if pc >= len(script):
                 raise ValueError("unexpected end of script")
+
             opcode, data, pc = tools.get_opcode(script, pc)
             l = len(data) if data else 0
+
             if l < 33 or l > 120:
                 break
+
             sec_keys.append(data)
+
         n = opcode + (1 - opcodes.OP_1)
         if m > n or len(sec_keys) != n:
             raise ValueError("n value wrong")
@@ -46,6 +54,7 @@ class ScriptMultisig(ScriptType):
         opcode, data, pc = tools.get_opcode(script, pc)
         if opcode != opcodes.OP_CHECKMULTISIG:
             raise ValueError("no OP_CHECKMULTISIG")
+
         if pc != len(script):
             raise ValueError("extra stuff at end")
 
@@ -61,6 +70,7 @@ class ScriptMultisig(ScriptType):
             public_keys = [b2h(sk) for sk in self.sec_keys]
             script_source = "%d %s %d OP_CHECKMULTISIG" % (self.m, " ".join(public_keys), len(public_keys))
             self._script = tools.compile(script_source)
+
         return self._script
 
     def _find_signatures(self, script, signature_for_hash_type_f, script_to_hash):
@@ -69,6 +79,7 @@ class ScriptMultisig(ScriptType):
         pc = 0
         seen = 0
         opcode, data, pc = tools.get_opcode(script, pc)
+
         # ignore the first opcode
         while pc < len(script) and seen < self.m:
             opcode, data, pc = tools.get_opcode(script, pc)
@@ -79,6 +90,7 @@ class ScriptMultisig(ScriptType):
                     public_pair = encoding.sec_to_public_pair(sec_key)
                     sign_value = signature_for_hash_type_f(signature_type, script_to_hash)
                     v = ecdsa.verify(ecdsa.generator_secp256k1, public_pair, sign_value, sig_pair)
+
                     if v:
                         signatures.append((idx, data))
                         secs_solved.add(sec_key)
@@ -86,6 +98,7 @@ class ScriptMultisig(ScriptType):
             except (encoding.EncodingError, UnexpectedDER):
                 # if public_pair is invalid, we just ignore it
                 pass
+
         return signatures, secs_solved
 
     def solve(self, **kwargs):
@@ -117,6 +130,7 @@ class ScriptMultisig(ScriptType):
         secs_solved = set()
         existing_signatures = []
         existing_script = kwargs.get("existing_script")
+
         if existing_script:
             existing_signatures, secs_solved = self._find_signatures(
                 existing_script, signature_for_hash_type_f, script_to_hash)
@@ -130,6 +144,7 @@ class ScriptMultisig(ScriptType):
             result = db.get(hash160)
             if result is None:
                 continue
+
             secret_exponent, public_pair, compressed = result
             binary_signature = self._create_script_signature(
                 secret_exponent, signature_for_hash_type_f, signature_type, script_to_hash)
@@ -145,6 +160,7 @@ class ScriptMultisig(ScriptType):
 
         script = "OP_0 %s" % " ".join(b2h(s[1]) for s in existing_signatures)
         solution = tools.compile(script)
+
         return solution
 
     def hash160s(self):
@@ -153,11 +169,14 @@ class ScriptMultisig(ScriptType):
     def addresses_f(self, netcode=None):
         from aiobitcoin.tools.networks import address_prefix_for_netcode
         from aiobitcoin.tools.networks.default import get_current_netcode
+
         if netcode is None:
             netcode = get_current_netcode()
+
         address_prefix = address_prefix_for_netcode(netcode)
         addresses = [encoding.hash160_sec_to_bitcoin_address(h1, address_prefix=address_prefix)
                      for h1 in self.hash160s()]
+
         return addresses
 
     def info(self, netcode=None):

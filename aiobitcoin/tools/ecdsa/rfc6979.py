@@ -43,6 +43,7 @@ else:
         # https://docs.python.org/3.5/library/stdtypes.html#int.bit_length
         s = bin(self)  # binary representation:  bin(-37) --> '-0b100101'
         s = s.lstrip('-0b')  # remove leading zeros and minus sign
+
         return len(s)  # len('100101') --> 6
 
 
@@ -57,10 +58,12 @@ def deterministic_generate_k(generator_order, secret_exponent, val, hash_f=hashl
     k = b'\x00' * hash_size
     priv = intstream.to_bytes(secret_exponent, length=order_size)
     shift = 8 * hash_size - bit_length(n)
+
     if shift > 0:
         val >>= shift
     if val > n:
         val -= n
+
     h1 = intstream.to_bytes(val, length=order_size)
     k = hmac.new(k, v + b'\x00' + priv + h1, hash_f).digest()
     v = hmac.new(k, v, hash_f).digest()

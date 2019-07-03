@@ -34,6 +34,7 @@ class ScriptPayToPublicKey(ScriptType):
             sec = r["PUBKEY_LIST"][0]
             s = cls(sec)
             return s
+
         raise ValueError("bad script")
 
     def script(self):
@@ -42,6 +43,7 @@ class ScriptPayToPublicKey(ScriptType):
             STANDARD_SCRIPT_OUT = "%s OP_CHECKSIG"
             script_text = STANDARD_SCRIPT_OUT % b2h(self.sec)
             self._script = tools.compile(script_text)
+
         return self._script
 
     def solve(self, **kwargs):
@@ -58,8 +60,10 @@ class ScriptPayToPublicKey(ScriptType):
         db = kwargs.get("hash160_lookup")
         if db is None:
             raise SolvingError("missing hash160_lookup parameter")
+
         self.address()
         result = db.get(encoding.hash160(self.sec))
+
         if result is None:
             raise SolvingError("can't find secret exponent for %s" % self.address())
 
@@ -71,6 +75,7 @@ class ScriptPayToPublicKey(ScriptType):
 
         solution = tools.bin_script([self._create_script_signature(
             secret_exponent, signature_for_hash_type_f, signature_type, script_to_hash)])
+
         return solution
 
     def info(self, netcode=None):
@@ -79,10 +84,13 @@ class ScriptPayToPublicKey(ScriptType):
         def address_f(netcode=netcode):
             from aiobitcoin.tools.networks import address_prefix_for_netcode
             from aiobitcoin.tools.networks.default import get_current_netcode
+
             if netcode is None:
                 netcode = get_current_netcode()
+
             address_prefix = address_prefix_for_netcode(netcode)
             address = encoding.hash160_sec_to_bitcoin_address(hash160, address_prefix=address_prefix)
+
             return address
 
         return dict(type="pay to public key", address_f=address_f, hash160=hash160, script=self._script)

@@ -18,8 +18,10 @@ class UnexpectedDER(Exception):
 def encode_integer(r):
     assert r >= 0  # can't support negative numbers yet
     h = "%x" % r
+
     if len(h) % 2:
         h = "0" + h
+
     s = binascii.unhexlify(h.encode("utf8"))
     if ord(s[:1]) <= 0x7f:
         return b"\x02" + int2byte(len(s)) + s
@@ -40,8 +42,10 @@ def remove_sequence(string):
         raise UnexpectedDER(
             "wanted sequence (0x30), got string length %d %s" % (
                 len(string), binascii.hexlify(string[:10])))
+
     length, lengthlength = read_length(string[1:])
     endseq = 1+lengthlength+length
+
     return string[1+lengthlength:endseq], string[endseq:]
 
 
@@ -50,15 +54,19 @@ def remove_integer(string, use_broken_open_ssl_mechanism=False):
     # bit set) as positive integers. Some apps depend upon this bug.
     if not string.startswith(b"\x02"):
         raise UnexpectedDER("did not get expected integer 0x02")
+
     length, llen = read_length(string[1:])
     if len(string) < 1+llen+length:
         raise UnexpectedDER("ran out of integer bytes")
+
     numberbytes = string[1+llen:1+llen+length]
     rest = string[1+llen+length:]
     v = int(binascii.hexlify(numberbytes), 16)
+
     if ord(numberbytes[:1]) >= 0x80:
         if not use_broken_open_ssl_mechanism:
             v -= (1 << (8 * length))
+
     return v, rest
 
 
@@ -66,11 +74,14 @@ def encode_length(l):
     assert l >= 0
     if l < 0x80:
         return int2byte(l)
+
     s = "%x" % l
     if len(s) % 2:
         s = "0"+s
+
     s = binascii.unhexlify(s)
     llen = len(s)
+
     return int2byte(0x80 | llen) + s
 
 
@@ -80,10 +91,12 @@ def read_length(string):
         # short form
         return (s0 & 0x7f), 1
     # else long-form: b0&0x7f is number of additional base256 length bytes,
+
     # big-endian
     llen = s0 & 0x7f
     if llen > len(string)-1:
         raise UnexpectedDER("ran out of length bytes")
+
     return int(binascii.hexlify(string[1:1+llen]), 16), 1+llen
 
 
@@ -96,4 +109,5 @@ def sigdecode_der(sig_der, use_broken_open_ssl_mechanism=True):
     rs_strings, empty = remove_sequence(sig_der)
     r, rest = remove_integer(rs_strings, use_broken_open_ssl_mechanism=use_broken_open_ssl_mechanism)
     s, empty = remove_integer(rest, use_broken_open_ssl_mechanism=use_broken_open_ssl_mechanism)
+
     return r, s

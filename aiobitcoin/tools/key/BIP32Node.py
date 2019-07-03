@@ -62,13 +62,13 @@ class BIP32Node(Key):
     https://en.bitcoin.it/wiki/BIP_0032
     """
     @classmethod
-    def from_master_secret(class_, master_secret, netcode='BTC'):
+    def from_master_secret(cls, master_secret, netcode='BTC'):
         """Generate a Wallet from a master password."""
         I64 = hmac.HMAC(key=b"Bitcoin seed", msg=master_secret, digestmod=hashlib.sha512).digest()
-        return class_(netcode=netcode, chain_code=I64[32:], secret_exponent=from_bytes_32(I64[:32]))
+        return cls(netcode=netcode, chain_code=I64[32:], secret_exponent=from_bytes_32(I64[:32]))
 
     @classmethod
-    def from_hwif(class_, b58_str, allow_subkey_suffix=True):
+    def from_hwif(cls, b58_str, allow_subkey_suffix=True):
         """Generate a Wallet from a base58 string in a standard way."""
         # : support subkey suffixes
 
@@ -91,7 +91,7 @@ class BIP32Node(Key):
         else:
             d["public_pair"] = sec_to_public_pair(data[45:])
 
-        return class_(**d)
+        return cls(**d)
 
     from_wallet_key = from_hwif
 
@@ -111,13 +111,17 @@ class BIP32Node(Key):
 
         if not isinstance(chain_code, bytes):
             raise TypeError("chain code must be bytes")
+
         if len(chain_code) != 32:
             raise ValueError("chain code wrong length")
+
         self._netcode = netcode
         self._chain_code = chain_code
         self._depth = depth
+
         if len(parent_fingerprint) != 4:
             raise EncodingError("parent_fingerprint wrong length")
+
         self._parent_fingerprint = parent_fingerprint
         self._child_index = child_index
         self._prefer_uncompressed = False
@@ -139,6 +143,7 @@ class BIP32Node(Key):
         """Yield a 78-byte binary blob corresponding to this node."""
         if as_private is None:
             as_private = self.secret_exponent() is not None
+
         if self.secret_exponent() is None and as_private:
             raise PublicPrivateMismatchError("public key has no private parts")
 
@@ -147,12 +152,15 @@ class BIP32Node(Key):
             ba.extend(prv32_prefix_for_netcode(self._netcode))
         else:
             ba.extend(pub32_prefix_for_netcode(self._netcode))
+
         ba.extend([self._depth])
         ba.extend(self._parent_fingerprint + struct.pack(">L", self._child_index) + self._chain_code)
+
         if as_private:
             ba += b'\0' + self._secret_exponent_bytes
         else:
             ba += self.sec(use_uncompressed=False)
+
         return bytes(ba)
 
     def fingerprint(self):
@@ -174,8 +182,10 @@ class BIP32Node(Key):
     def _subkey(self, i, is_hardened, as_private):
         if i < 0:
             raise ValueError("i can't be negative")
+
         if i >= 0x80000000:
             raise ValueError("subkey index 0x%x too large" % i)
+
         i &= 0x7fffffff
         if is_hardened:
             i |= 0x80000000
@@ -186,21 +196,27 @@ class BIP32Node(Key):
         if self.secret_exponent() is None:
             if is_hardened:
                 raise PublicPrivateMismatchError("can't derive a private key from a public key")
+
             d["public_pair"], chain_code = subkey_public_pair_chain_code_pair(
                 self.public_pair(), self._chain_code, i)
         else:
             d["secret_exponent"], chain_code = subkey_secret_exponent_chain_code_pair(
                 self.secret_exponent(), self._chain_code, i, is_hardened, self.public_pair())
+
         d["chain_code"] = chain_code
         key = self.__class__(**d)
+
         if not as_private:
             key = key.public_copy()
+
         return key
 
     def __repr__(self):
         r = self.as_text(as_private=False)
+
         if self.secret_exponent():
             return "private_for <%s>" % r
+
         return "<%s>" % r
 
     def subkey(self, i=0, is_hardened=False, as_private=None):
@@ -212,11 +228,14 @@ class BIP32Node(Key):
         as_private: set to True to get a private subkey."""
         if as_private is None:
             as_private = self.secret_exponent() is not None
+
         is_hardened = not not is_hardened
         as_private = not not as_private
         lookup = (i, is_hardened, as_private)
+
         if lookup not in self._subkey_cache:
             self._subkey_cache[lookup] = self._subkey(i, is_hardened, as_private)
+
         return self._subkey_cache[lookup]
 
     def subkey_for_path(self, path):
@@ -234,19 +253,25 @@ class BIP32Node(Key):
         derivation and stick with it.
         """
         force_public = (path[-4:] == '.pub')
+
         if force_public:
             path = path[:-4]
+
         key = self
         if path:
             invocations = path.split("/")
             for v in invocations:
                 is_hardened = v[-1] in ("'pH")
+
                 if is_hardened:
                     v = v[:-1]
+
                 v = int(v)
                 key = key.subkey(i=v, is_hardened=is_hardened, as_private=key.secret_exponent() is not None)
+
         if force_public and key.secret_exponent() is not None:
             key = key.public_copy()
+
         return key
 
     def subkeys(self, path):
@@ -260,8 +285,10 @@ class BIP32Node(Key):
         def range_iterator(the_range):
             for r in the_range.split(","):
                 is_hardened = r[-1] in "'pH"
+
                 if is_hardened:
                     r = r[:-1]
+
                 hardened_char = "H" if is_hardened else ''
                 if '-' in r:
                     low, high = [int(x) for x in r.split("-", 1)]
@@ -281,6 +308,7 @@ class BIP32Node(Key):
 
             components = subkey_paths.split("/")
             iterators = [range_iterator(c) for c in components]
+
             for v in itertools.product(*iterators):
                 yield '/'.join(v)
 

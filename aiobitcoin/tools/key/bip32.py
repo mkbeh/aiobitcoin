@@ -101,18 +101,22 @@ def subkey_secret_exponent_chain_code_pair(
     else:
         if public_pair is None:
             public_pair = ecdsa.public_pair_for_secret_exponent(ecdsa.generator_secp256k1, secret_exponent)
+
         sec = public_pair_to_sec(public_pair, compressed=True)
         data = sec + i_as_bytes
 
     I64 = hmac.HMAC(key=chain_code_bytes, msg=data, digestmod=hashlib.sha512).digest()
     I_left_as_exponent = from_bytes_32(I64[:32])
+
     if I_left_as_exponent >= ORDER:
         logger.critical(_SUBKEY_VALIDATION_LOG_ERR_FMT)
         raise DerivationError('I_L >= {}'.format(ORDER))
+
     new_secret_exponent = (I_left_as_exponent + secret_exponent) % ORDER
     if new_secret_exponent == 0:
         logger.critical(_SUBKEY_VALIDATION_LOG_ERR_FMT)
         raise DerivationError('k_{} == 0'.format(i))
+
     new_chain_code = I64[32:]
     return new_secret_exponent, new_chain_code
 
@@ -141,6 +145,7 @@ def subkey_public_pair_chain_code_pair(public_pair, chain_code_bytes, i):
 
     the_point = I_left_as_exponent * ecdsa.generator_secp256k1 + \
         ecdsa.Point(ecdsa.generator_secp256k1.curve(), x, y, ORDER)
+
     if the_point == INFINITY:
         logger.critical(_SUBKEY_VALIDATION_LOG_ERR_FMT)
         raise DerivationError('K_{} == {}'.format(i, the_point))
@@ -149,6 +154,8 @@ def subkey_public_pair_chain_code_pair(public_pair, chain_code_bytes, i):
     if I_left_as_exponent >= ORDER:
         logger.critical(_SUBKEY_VALIDATION_LOG_ERR_FMT)
         raise DerivationError('I_L >= {}'.format(ORDER))
+
     new_public_pair = the_point.pair()
     new_chain_code = I64[32:]
+
     return new_public_pair, new_chain_code

@@ -14,6 +14,7 @@ def xgcd(a: int, b: int) -> Tuple[int, int, int]:
         q, b, a = b // a, a, b % a
         y0, y1 = y1, y0 - q * y1
         x0, x1 = x1, x0 - q * x1
+
     return b, x0, y0
 
 
@@ -26,8 +27,10 @@ def mod_inv(a: int, m: int) -> int:
 
     a %= m
     g, x, _ = xgcd(a, m)
+
     if g == 1:
         return x % m
+
     raise ValueError(f"{hex(a)} has no inverse (mod {hex(m)})")
 
 
@@ -66,6 +69,7 @@ def mod_sqrt(a: int, p: int) -> int:
         x = pow(a, (p >> 2) + 1, p)  # inverse candidate
         if x * x % p == a:
             return x
+
         raise ValueError(f"{hex(a)} has no root (mod {hex(p)})")
     elif p % 8 == 5:
         x = pow(a, (p >> 3) + 1, p)
@@ -75,6 +79,7 @@ def mod_sqrt(a: int, p: int) -> int:
             x = x * pow(2, p >> 2, p) % p
             if x * x % p == a:
                 return x
+
         raise ValueError(f"{hex(a)} has no root (mod {hex(p)})")
     elif a == 0 or p == 2:
         return a

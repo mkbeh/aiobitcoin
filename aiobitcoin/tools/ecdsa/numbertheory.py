@@ -15,6 +15,7 @@ def inverse_mod(a, m):
 
     c, d = a, m
     uc, vc, ud, vd = 1, 0, 0, 1
+
     while c != 0:
         q, c, d = divmod(d, c) + (c,)
         uc, vc, ud, vd = ud - q*uc, vd - q*vc, uc, vc
@@ -71,6 +72,7 @@ def modular_sqrt(a, p):
     #
     s = p - 1
     e = 0
+
     while s % 2 == 0:
         s /= 2
         e += 1
@@ -105,9 +107,11 @@ def modular_sqrt(a, p):
     while True:
         t = b
         m = 0
+
         for m in range(r):
             if t == 1:
                 break
+
             t = pow(t, 2, p)
 
         if m == 0:

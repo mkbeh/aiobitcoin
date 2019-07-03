@@ -27,6 +27,7 @@ def verify_minimal_data(opcode, data):
     ld = len(data)
     if ld == 0 and opcode == opcodes.OP_0:
         return
+
     if ld == 1:
         v = byte2int(data)
         if v == 0x81:
@@ -36,17 +37,22 @@ def verify_minimal_data(opcode, data):
             return
         elif v == (opcode - 1 + opcodes.OP_1):
             return
+
     if 1 < ld < 0x4c and opcode == ld:
         return
+
     if 0x4c <= ld < 256 and opcode == opcodes.OP_PUSHDATA1:
         return
+
     if 256 < ld < 65536 and opcode == opcodes.OP_PUSHDATA2:
         return
+
     raise ScriptError("not minimal push of %s" % repr(data), errno.MINIMALDATA)
 
 
 def verify(ss):
     v = bool_from_script_bytes(ss.stack.pop())
+
     if not v:
         raise ScriptError("VERIFY failed at %d" % (ss.pc-1), errno.VERIFY)
 
@@ -55,6 +61,7 @@ def make_bad_opcode(opcode, even_outside_conditional=False, err=errno.BAD_OPCODE
     def bad_opcode(ss):
         raise ScriptError("invalid opcode %s at %d" % (
             opcodes.INT_TO_OPCODE.get(opcode, hex(opcode)), ss.pc-1), err)
+
     bad_opcode.outside_conditional = even_outside_conditional
     return bad_opcode
 
@@ -80,6 +87,7 @@ def op_toaltstack(ss):
 def op_fromaltstack(ss):
     if len(ss.altstack) < 1:
         raise ScriptError("alt stack empty", errno.INVALID_ALTSTACK_OPERATION)
+
     ss.stack.append(ss.altstack.pop())
 
 
@@ -122,17 +130,24 @@ def make_if(reverse_bool=False):
     def f(ss):
         v = False
         all_if_true = functools.reduce(lambda x, y: x and y, ss.if_condition_stack, True)
+
         if all_if_true:
             if len(ss.stack) < 1:
                 raise ScriptError("IF with no condition", errno.UNBALANCED_CONDITIONAL)
+
             item = ss.stack.pop()
+
             if ss.flags & VERIFY_MINIMALIF:
                 if item not in (b'', b'\1'):
                     raise ScriptError("non-minimal IF", errno.MINIMALIF)
+
             v = bool_from_script_bytes(item)
+
         if reverse_bool:
             v = not v
+
         ss.if_condition_stack.append(v)
+
     f.outside_conditional = True
     return f
 
@@ -140,6 +155,7 @@ def make_if(reverse_bool=False):
 def op_else(ss):
     if len(ss.if_condition_stack) == 0:
         raise ScriptError("OP_ELSE without OP_IF", errno.UNBALANCED_CONDITIONAL)
+
     ss.if_condition_stack[-1] = not ss.if_condition_stack[-1]
 
 
@@ -149,6 +165,7 @@ op_else.outside_conditional = True
 def op_endif(ss):
     if len(ss.if_condition_stack) == 0:
         raise ScriptError("OP_ENDIF without OP_IF", errno.UNBALANCED_CONDITIONAL)
+
     ss.if_condition_stack.pop()
 
 
@@ -160,19 +177,26 @@ def check_locktime_verify(ss):
         if (ss.flags & VERIFY_DISCOURAGE_UPGRADABLE_NOPS):
             raise ScriptError("discouraging nops", errno.DISCOURAGE_UPGRADABLE_NOPS)
         return
+
     if ss.lock_time is None:
         raise ScriptError("nSequence equal to 0xffffffff")
+
     if len(ss.stack) < 1:
         raise ScriptError("empty stack on CHECKLOCKTIMEVERIFY")
+
     if len(ss.stack[-1]) > 5:
         raise ScriptError("script number overflow")
+
     max_lock_time = int_from_script_bytes(ss.stack[-1])
     if max_lock_time < 0:
         raise ScriptError("top stack item negative on CHECKLOCKTIMEVERIFY")
+
     era_max = (max_lock_time >= 500000000)
     era_lock_time = (ss.lock_time >= 500000000)
+
     if era_max != era_lock_time:
         raise ScriptError("eras differ in CHECKLOCKTIMEVERIFY")
+
     if max_lock_time > ss.lock_time:
         raise ScriptError("nLockTime too soon")
 
@@ -182,20 +206,27 @@ def check_sequence_verify(ss):
         if (ss.flags & VERIFY_DISCOURAGE_UPGRADABLE_NOPS):
             raise ScriptError("discouraging nops", errno.DISCOURAGE_UPGRADABLE_NOPS)
         return
+
     if len(ss.stack) < 1:
         raise ScriptError("empty stack on CHECKSEQUENCEVERIFY", errno.INVALID_STACK_OPERATION)
+
     if len(ss.stack[-1]) > 5:
         raise ScriptError("script number overflow", errno.INVALID_STACK_OPERATION+1)
+
     require_minimal = ss.flags & VERIFY_MINIMALDATA
     sequence = int_from_script_bytes(ss.stack[-1], require_minimal=require_minimal)
+
     if sequence < 0:
         raise ScriptError(
             "top stack item negative on CHECKSEQUENCEVERIFY", errno.NEGATIVE_LOCKTIME)
+
     if sequence & SEQUENCE_LOCKTIME_DISABLE_FLAG:
         return
+
     # do the actual check
     if ss.tx_version < 2:
         raise ScriptError("CHECKSEQUENCEVERIFY: bad tx version", errno.UNSATISFIED_LOCKTIME)
+
     if ss.tx_sequence & SEQUENCE_LOCKTIME_DISABLE_FLAG:
         raise ScriptError("CHECKSEQUENCEVERIFY: locktime disabled")
 
@@ -205,11 +236,13 @@ def check_sequence_verify(ss):
     mask = SEQUENCE_LOCKTIME_TYPE_FLAG | SEQUENCE_LOCKTIME_MASK
     sequence_masked = sequence & mask
     tx_sequence_masked = ss.tx_sequence & mask
+
     if not (((tx_sequence_masked < SEQUENCE_LOCKTIME_TYPE_FLAG) and
              (sequence_masked < SEQUENCE_LOCKTIME_TYPE_FLAG)) or
             ((tx_sequence_masked >= SEQUENCE_LOCKTIME_TYPE_FLAG) and
              (sequence_masked >= SEQUENCE_LOCKTIME_TYPE_FLAG))):
         raise ScriptError("sequence numbers not comparable")
+
     if sequence_masked > tx_sequence_masked:
         raise ScriptError("sequence number too small")
 
@@ -353,16 +386,20 @@ def eval_script(script, signature_for_hash_type_f, lock_time, expected_hash_type
 
         if data and len(data) > 520 and disallow_long_scripts:
             raise ScriptError("pushing too much data onto stack", errno.PUSH_SIZE)
+
         if opcode > opcodes.OP_16:
             op_count += 1
+
         stack_top = stack[-1] if stack else b''
 
         if len(stack) + len(altstack) > 1000:
             raise ScriptError("stack has > 1000 items", errno.STACK_SIZE)
+
         eval_instruction(ss, old_pc)
 
         if opcode in (opcodes.OP_CHECKMULTISIG, opcodes.OP_CHECKMULTISIGVERIFY):
             op_count += int_from_script_bytes(stack_top)
+
         if op_count > 201:
             raise ScriptError("script contains too many operations", errno.OP_COUNT)
 

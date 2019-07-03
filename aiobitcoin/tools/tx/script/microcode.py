@@ -23,8 +23,10 @@ do_OP_NOP6 = do_OP_NOP7 = do_OP_NOP8 = do_OP_NOP9 = do_OP_NOP10 = lambda s: None
 
 def nonnegative_int_from_script_bytes(b, require_minimal):
     v = int_from_script_bytes(b, require_minimal=require_minimal)
+
     if v < 0:
         raise ScriptError("unexpectedly got negative value", errno.INVALID_STACK_OPERATION)
+
     return v
 
 
@@ -393,6 +395,7 @@ do_OP_MAX = make_bin_op(max)
 def do_OP_NUMEQUALVERIFY(stack, require_minimal):
     do_OP_NUMEQUAL(stack, require_minimal=require_minimal)
     v = bool_from_script_bytes(stack.pop())
+
     if not v:
         raise ScriptError("VERIFY failed", errno.VERIFY)
 
@@ -504,12 +507,14 @@ def do_OP_0NOTEQUAL(stack, require_minimal):
 def build_ops_lookup():
     d = {}
     the_globals = globals()
+
     for opcode_int, opcode_name in INT_TO_OPCODE.items():
         do_f_name = "do_%s" % opcode_name
         if do_f_name in the_globals:
             f = the_globals[do_f_name]
             f.require_minimal = len(inspect.getargspec(f).args) > 1
             d[opcode_int] = f
+
     return d
 
 

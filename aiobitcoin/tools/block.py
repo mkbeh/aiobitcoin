@@ -16,6 +16,7 @@ class BadMerkleRootError(Exception):
 def difficulty_max_mask_for_bits(bits):
     prefix = bits >> 24
     mask = (bits & 0x7ffff) << (8 * (prefix - 3))
+
     return mask
 
 
@@ -25,30 +26,33 @@ class Block(object):
     Tx = Tx
 
     @classmethod
-    def parse(class_, f, include_transactions=True, include_offsets=None):
+    def parse(cls, f, include_transactions=True, include_offsets=None):
         """
         Parse the Block from the file-like object
         """
-        block = class_.parse_as_header(f)
+        block = cls.parse_as_header(f)
+
         if include_transactions:
             count = parse_struct("I", f)[0]
             txs = block._parse_transactions(f, count, include_offsets=include_offsets)
             block.set_txs(txs)
+
         return block
 
     @classmethod
-    def parse_as_header(class_, f):
+    def parse_as_header(cls, f):
         """
         Parse the Block header from the file-like object
         """
         (version, previous_block_hash, merkle_root, timestamp,
             difficulty, nonce) = parse_struct("L##LLL", f)
-        return class_(version, previous_block_hash, merkle_root, timestamp, difficulty, nonce)
+
+        return cls(version, previous_block_hash, merkle_root, timestamp, difficulty, nonce)
 
     @classmethod
-    def from_bin(class_, bytes):
+    def from_bin(cls, bytes):
         f = io.BytesIO(bytes)
-        return class_.parse(f)
+        return cls.parse(f)
 
     def __init__(self, version, previous_block_hash, merkle_root, timestamp, difficulty, nonce):
         self.version = version
@@ -67,6 +71,7 @@ class Block(object):
     def _calculate_hash(self):
         s = io.BytesIO()
         self.stream_header(s)
+
         return double_sha256(s.getvalue())
 
     def hash(self):
@@ -83,18 +88,23 @@ class Block(object):
         for i in range(count):
             if include_offsets:
                 offset_in_block = f.tell()
+
             tx = class_.Tx.parse(f)
             txs.append(tx)
+
             if include_offsets:
                 tx.offset_in_block = offset_in_block
+
         return txs
 
     def set_txs(self, txs):
         self.txs = txs
         if not txs:
             return
+
         for tx in txs:
             tx.block = self
+
         self.check_merkle_hash()
 
     def as_blockheader(self):

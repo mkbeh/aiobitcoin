@@ -13,8 +13,10 @@ class Network(object):
     def __init__(self, *args, **kwargs):
         for arg, name in zip(args, DEFAULT_ARGS_ORDER):
             kwargs[name] = arg
+
         for k, v in kwargs.items():
             if k not in DEFAULT_ARGS_ORDER:
                 raise TypeError("unexpected argument %s" % k)
+
         for name in DEFAULT_ARGS_ORDER:
             setattr(self, name, kwargs.get(name, None))

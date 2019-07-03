@@ -24,6 +24,7 @@ def int_from_octets(o: Octets) -> int:
     """
     if isinstance(o, str):  # hex string
         o = bytes.fromhex(o)
+
     return int.from_bytes(o, 'big')
 
 

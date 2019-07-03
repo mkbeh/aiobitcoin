@@ -58,6 +58,7 @@ def _transform_NetworkValues_to_Network(nv):
     defaults = dict(
         tx=None, block=None, magic_header=None, dns_bootstrap=[], default_port=None, bech32_hrp=None)
     defaults.update(nv._asdict())
+
     return Network(**defaults)
 
 

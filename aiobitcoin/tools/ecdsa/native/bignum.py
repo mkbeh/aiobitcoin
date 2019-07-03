@@ -34,8 +34,10 @@ def bignum_type_for_library(library):
 
         def __init__(self, n=0):
             negative = (n < 0)
+
             if negative:
                 n = -n
+
             the_len = (n.bit_length() + 7)//8
             sign = b'\x80' if negative else b'\0'
             the_bytes = struct.pack(">L", the_len+1) + sign + to_bytes(n, the_len, "big")
@@ -50,11 +52,14 @@ def bignum_type_for_library(library):
         def to_int(self):
             "Return this bignum's value as a Python integer."
             value, factor = 0, 1
+
             for w in self.datawords():
                 value += w * factor
                 factor *= ULONG_FACTOR
+
             if self.neg:
                 value = -value
+
             return value
 
         def datawords(self):
@@ -63,4 +68,5 @@ def bignum_type_for_library(library):
 
         def __repr__(self):
             return "BignumType(%d)" % self.to_int()
+
     return BignumType

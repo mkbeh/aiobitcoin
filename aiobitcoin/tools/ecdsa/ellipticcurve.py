@@ -82,9 +82,11 @@ class Point(object):
         self.__x = x
         self.__y = y
         self.__order = order
+
         # self.curve is allowed to be None only for INFINITY:
         if self.__curve and not self.__curve.contains_point(x, y):
             raise NoSuchPointError('({},{}) is not on the curve {}'.format(x, y, curve))
+
         if order:
             assert self * order == INFINITY
 
@@ -104,9 +106,12 @@ class Point(object):
 
         if other == INFINITY:
             return self
+
         if self == INFINITY:
             return other
+
         assert self.__curve == other.__curve
+
         if self.__x == other.__x:
             if (self.__y + other.__y) % self.__curve.p() == 0:
                 return INFINITY
@@ -129,17 +134,22 @@ class Point(object):
         def leftmost_bit(x):
             assert x > 0
             result = 1
+
             while result <= x:
                 result = 2 * result
+
             return result // 2
 
         e = other
         if self.__order:
             e = e % self.__order
+
         if e == 0:
             return INFINITY
+
         if self == INFINITY:
             return INFINITY
+
         assert e > 0
 
         # From X9.62 D.3.2:
@@ -151,13 +161,17 @@ class Point(object):
         negative_self = Point(self.__curve, self.__x, -self.__y, self.__order)
         i = leftmost_bit(e3) // 2
         result = self
+
         # print "Multiplying %s by %d (e3 = %d):" % (self, other, e3)
         while i > 1:
             result = result.double()
+
             if (e3 & i) != 0 and (e & i) == 0:
                 result = result + self
+
             if (e3 & i) == 0 and (e & i) != 0:
                 result = result + negative_self
+
             # print ". . . i = %d, result = %s" % (i, result)
             i = i // 2
 
@@ -174,6 +188,7 @@ class Point(object):
     def __str__(self):
         if self == INFINITY:
             return "infinity"
+
         return "(%d,%d)" % (self.__x, self.__y)
 
     def double(self):
@@ -226,6 +241,7 @@ def __main__():
         p2 = Point(c, x2, y2)
         p3 = p1 + p2
         print("%s + %s = %s" % (p1, p2, p3))
+
         if p3.x() != x3 or p3.y() != y3:
             raise FailedTest("Failure: should give (%d,%d)." % (x3, y3))
         else:
@@ -236,6 +252,7 @@ def __main__():
         p1 = Point(c, x1, y1)
         p3 = p1.double()
         print("%s doubled = %s" % (p1, p3))
+
         if p3.x() != x3 or p3.y() != y3:
             raise FailedTest("Failure: should give (%d,%d)." % (x3, y3))
         else:
@@ -246,6 +263,7 @@ def __main__():
         p1 = INFINITY
         p3 = p1.double()
         print("%s doubled = %s" % (p1, p3))
+
         if p3.x() != INFINITY.x() or p3.y() != INFINITY.y():
             raise FailedTest("Failure: should give (%d,%d)." % (INFINITY.x(), INFINITY.y()))
         else:
@@ -256,6 +274,7 @@ def __main__():
         p1 = Point(c, x1, y1)
         p3 = p1 * m
         print("%s * %d = %s" % (p1, m, p3))
+
         if p3.x() != x3 or p3.y() != y3:
             raise FailedTest("Failure: should give (%d,%d)." % (x3, y3))
         else:
@@ -279,10 +298,12 @@ def __main__():
     for i in range(7 + 1):
         p = (i % 7) * g
         print("%s * %d = %s, expected %s . . ." % (g, i, p, check))
+
         if p == check:
             print(" Good.")
         else:
             raise FailedTest("Bad.")
+
         check = check + g
 
     # NIST Curve P-192:
@@ -302,6 +323,7 @@ def __main__():
 
     d = 651056770906015076056810763456358567190100156695615665659
     Q = d * p192
+
     if Q.x() != 0x62B12D60690CDCF330BABAB6E69763B471F994DD702D16A5:
         raise FailedTest("p192 * d came out wrong.")
     else:
@@ -309,6 +331,7 @@ def __main__():
 
     k = 6140507067065001063065065565667405560006161556565665656654
     R = k * p192
+
     if R.x() != 0x885052380FF147B734C330C43D39B2C4A89F29B0F749FEAD \
        or R.y() != 0x9CF9FA1CBEFEFB917747A3BB29C072B9289C2547884FD835:
         raise FailedTest("k * p192 came out wrong.")
@@ -318,6 +341,7 @@ def __main__():
         u1 = 2563697409189434185194736134579731015366492496392189760599
         u2 = 6266643813348617967186477710235785849136406323338782220568
         temp = u1 * p192 + u2 * Q
+
         if temp.x() != 0x885052380FF147B734C330C43D39B2C4A89F29B0F749FEAD \
            or temp.y() != 0x9CF9FA1CBEFEFB917747A3BB29C072B9289C2547884FD835:
             raise FailedTest("u1 * p192 + u2 * Q came out wrong.")

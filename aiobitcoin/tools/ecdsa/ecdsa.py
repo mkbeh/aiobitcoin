@@ -21,12 +21,16 @@ def sign(generator, secret_exponent, val, gen_k=deterministic_generate_k):
     k = gen_k(n, secret_exponent, val)
     p1 = k * G
     r = p1.x()
+
     if r == 0:
         raise RuntimeError("amazingly unlucky random number r")
+
     s = (numbertheory.inverse_mod(k, n) *
          (val + (secret_exponent * r) % n)) % n
+
     if s == 0:
         raise RuntimeError("amazingly unlucky random number s")
+
     return (r, s)
 
 
@@ -39,8 +43,10 @@ def public_pair_for_x(generator, x, is_even):
     p = curve.p()
     alpha = (pow(x, 3, p) + curve.a() * x + curve.b()) % p
     beta = numbertheory.modular_sqrt(alpha, p)
+
     if bool(is_even) == bool(beta & 1):
         return (x, p - beta)
+
     return (x, beta)
 
 
@@ -59,15 +65,19 @@ def verify(generator, public_pair, val, signature):
     G = generator
     n = G.order()
     r, s = signature
+
     if r < 1 or r > n-1:
         return False
+
     if s < 1 or s > n-1:
         return False
+
     c = numbertheory.inverse_mod(s, n)
     u1 = (val * c) % n
     u2 = (r * c) % n
     point = u1 * G + u2 * ellipticcurve.Point(G.curve(), public_pair[0], public_pair[1], G.order())
     v = point.x() % n
+
     return v == r
 
 
@@ -90,6 +100,7 @@ def possible_public_pairs_for_signature(generator, value, signature):
     # 1.3
     alpha = (pow(x, 3, p) + curve.a() * x + curve.b()) % p
     beta = numbertheory.modular_sqrt(alpha, p)
+
     for y in [beta, p - beta]:
         # 1.4 the constructor checks that nR is at infinity
         R = ellipticcurve.Point(curve, x, y, order)
@@ -97,7 +108,9 @@ def possible_public_pairs_for_signature(generator, value, signature):
         Q = inv_r * (s * R + minus_e * G)
         public_pair = (Q.x(), Q.y())
         # check that Q is the public key
+
         if verify(generator, public_pair, value, signature):
             # check that we get the original signing address
             possible_points.append(public_pair)
+
     return possible_points

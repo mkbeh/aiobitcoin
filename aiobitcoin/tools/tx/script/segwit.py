@@ -47,13 +47,17 @@ def witness_program_version(script):
     l = len(script)
     if l < 4 or l > 42:
         return None
+
     first_opcode = byte2int(script)
     if indexbytes(script, 1) + 2 != l:
         return None
+
     if first_opcode == opcodes.OP_0:
         return 0
+
     if opcodes.OP_1 <= first_opcode <= opcodes.OP_16:
         return first_opcode - opcodes.OP_1 + 1
+
     return None
 
 
@@ -77,6 +81,7 @@ def check_witness_program_v0(
         stack = Stack(witness)
     else:
         raise ScriptError("witness program wrong length", errno.WITNESS_PROGRAM_WRONG_LENGTH)
+
     return stack, script_public_key
 
 
@@ -112,6 +117,7 @@ def check_witness(stack, script_public_key, script_signature, witness, witness_f
                   lock_time, expected_hash_type, traceback_f, tx_sequence, tx_version):
     witness_version = witness_program_version(script_public_key)
     had_witness = False
+
     if witness_version is not None:
         had_witness = True
         witness_program = script_public_key[2:]
@@ -123,4 +129,5 @@ def check_witness(stack, script_public_key, script_signature, witness, witness_f
             signature_for_hash_type_f, lock_time, expected_hash_type,
             traceback_f, tx_sequence, tx_version)
         stack[:] = stack[-1:]
+
     return had_witness

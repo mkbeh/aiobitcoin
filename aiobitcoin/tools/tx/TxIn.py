@@ -41,22 +41,26 @@ class TxIn(object):
         """Return the public key as sec, or None in case of failure."""
         if self.is_coinbase():
             return None
+
         opcodes = opcode_list(self.script)
         if len(opcodes) == 2 and opcodes[0].startswith("[30"):
             # the second opcode is probably the public key as sec
             sec = h2b(opcodes[1][1:-1])
             return sec
+
         return None
 
     def address(self, address_prefix=b'\0'):
         if self.is_coinbase():
             return "(coinbase)"
+
         # attempt to return the source address
         sec = self.public_key_sec()
         if sec:
             bitcoin_address = encoding.hash160_sec_to_bitcoin_address(
                 encoding.hash160(sec), address_prefix=address_prefix)
             return bitcoin_address
+
         return "(unknown)"
 
     bitcoin_address = address
@@ -71,6 +75,7 @@ class TxIn(object):
         """
         if self.sequence == 0xffffffff:
             lock_time = None
+
         return verify_script(self.script, tx_out_script, signature_for_hash_type_f, lock_time=lock_time,
                              flags=flags, expected_hash_type=expected_hash_type, traceback_f=traceback_f,
                              witness=self.witness, tx_sequence=self.sequence, tx_version=tx_version)
@@ -78,5 +83,6 @@ class TxIn(object):
     def __str__(self):
         if self.is_coinbase():
             return 'TxIn<COINBASE: %s>' % b2h(self.script)
+
         return 'TxIn<%s[%d] "%s">' % (
             b2h_rev(self.previous_hash), self.previous_index, disassemble(self.script))

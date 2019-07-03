@@ -47,28 +47,35 @@ class Key(object):
 
         if is_compressed is None:
             is_compressed = False if hash160 else True
+
         if netcode is None:
             netcode = get_current_netcode()
+
         if [secret_exponent, public_pair, hash160].count(None) != 2:
             raise ValueError("exactly one of secret_exponent, public_pair, hash160 must be passed.")
+
         if prefer_uncompressed is None:
             prefer_uncompressed = not is_compressed
+
         self._prefer_uncompressed = prefer_uncompressed
         self._secret_exponent = secret_exponent
         self._public_pair = public_pair
         self._hash160_uncompressed = None
         self._hash160_compressed = None
+
         if hash160:
             if is_compressed:
                 self._hash160_compressed = hash160
             else:
                 self._hash160_uncompressed = hash160
+
         self._netcode = netcode
 
         if self._public_pair is None and self._secret_exponent is not None:
             if self._secret_exponent < 1 \
                     or self._secret_exponent >= ecdsa.generator_secp256k1.order():
                 raise InvalidSecretExponentError()
+
             public_pair = ecdsa.public_pair_for_secret_exponent(
                 ecdsa.generator_secp256k1, self._secret_exponent)
             self._public_pair = public_pair
@@ -79,7 +86,7 @@ class Key(object):
             raise InvalidPublicPairError()
 
     @classmethod
-    def from_text(class_, text, is_compressed=False):
+    def from_text(cls, text, is_compressed=False):
         """
         This function will accept a BIP0032 wallet string, a WIF, or a bitcoin address.
 
@@ -99,11 +106,14 @@ class Key(object):
             is_compressed = (len(data) > 32)
             if is_compressed:
                 data = data[:-1]
+
             return Key(
                 secret_exponent=from_bytes_32(data),
                 prefer_uncompressed=not is_compressed, netcode=netcode)
+
         if key_type == 'address':
             return Key(hash160=data, is_compressed=is_compressed, netcode=netcode)
+
         raise EncodingError("unknown text: %s" % text)
 
     @classmethod
@@ -130,8 +140,10 @@ class Key(object):
         """
         wif_prefix = wif_prefix_for_netcode(self._netcode)
         secret_exponent = self.secret_exponent()
+
         if secret_exponent is None:
             return None
+
         return secret_exponent_to_wif(secret_exponent,
                                       compressed=not self._use_uncompressed(use_uncompressed),
                                       wif_prefix=wif_prefix)
@@ -154,8 +166,10 @@ class Key(object):
         If use_uncompressed is not set, the preferred representation is returned.
         """
         public_pair = self.public_pair()
+
         if public_pair is None:
             return None
+
         return public_pair_to_sec(public_pair, compressed=not self._use_uncompressed(use_uncompressed))
 
     def sec_as_hex(self, use_uncompressed=None):
@@ -164,8 +178,10 @@ class Key(object):
         If use_uncompressed is not set, the preferred representation is returned.
         """
         sec = self.sec(use_uncompressed=use_uncompressed)
+
         if sec is None:
             return None
+
         return b2h(sec)
 
     def hash160(self, use_uncompressed=None):
@@ -174,6 +190,7 @@ class Key(object):
         If use_uncompressed is not set, the preferred representation is returned.
         """
         use_uncompressed = self._use_uncompressed(use_uncompressed)
+
         if self.public_pair() is None:
             if use_uncompressed:
                 return self._hash160_uncompressed
@@ -186,6 +203,7 @@ class Key(object):
 
         if self._hash160_compressed is None:
             self._hash160_compressed = hash160(self.sec(use_uncompressed=use_uncompressed))
+
         return self._hash160_compressed
 
     def address(self, use_uncompressed=None):
@@ -195,8 +213,10 @@ class Key(object):
         """
         address_prefix = address_prefix_for_netcode(self._netcode)
         hash160 = self.hash160(use_uncompressed=use_uncompressed)
+
         if hash160:
             return hash160_sec_to_bitcoin_address(hash160, address_prefix=address_prefix)
+
         return None
 
     bitcoin_address = address
@@ -207,9 +227,11 @@ class Key(object):
         """
         if self.secret_exponent():
             return self.wif()
+
         sec_hex = self.sec_as_hex()
         if sec_hex:
             return sec_hex
+
         return self.address()
 
     def public_copy(self):
@@ -239,9 +261,10 @@ class Key(object):
         """
         if not self.is_private():
             raise RuntimeError("Key must be private to be able to sign")
+
         val = from_bytes_32(h)
-        r, s = ecdsa.sign(ecdsa.generator_secp256k1, self.secret_exponent(),
-                          val)
+        r, s = ecdsa.sign(ecdsa.generator_secp256k1, self.secret_exponent(), val)
+
         return sigencode_der(r, s)
 
     def verify(self, h, sig):
@@ -251,34 +274,42 @@ class Key(object):
         val = from_bytes_32(h)
         pubkey = self.public_pair()
         rs = sigdecode_der(sig)
+
         if self.public_pair() is None:
             # find the pubkey from the signature and see if it matches
             # our key
             possible_pubkeys = ecdsa.possible_public_pairs_for_signature(
                 ecdsa.generator_secp256k1, val, rs)
             hash160 = self.hash160()
+
             for candidate in possible_pubkeys:
                 if hash160 == public_pair_to_hash160_sec(candidate, True):
                     pubkey = candidate
                     break
+
                 if hash160 == public_pair_to_hash160_sec(candidate, False):
                     pubkey = candidate
                     break
             else:
                 # signature is using a pubkey that's not this key
                 return False
+
         return ecdsa.verify(ecdsa.generator_secp256k1, pubkey, val, rs)
 
     def _use_uncompressed(self, use_uncompressed=None):
         if use_uncompressed:
             return use_uncompressed
+
         if use_uncompressed is None:
             return self._prefer_uncompressed
+
         return False
 
     def __repr__(self):
         r = self.public_copy().as_text()
+
         if self.is_private():
             return "private_for <%s>" % r
+
         return "<%s>" % r
 

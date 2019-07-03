@@ -18,10 +18,12 @@ class ScriptPayToScript(ScriptType):
     @classmethod
     def from_script(cls, script):
         r = cls.match(script)
+
         if r:
             hash160 = r["PUBKEYHASH_LIST"][0]
             s = cls(hash160)
             return s
+
         raise ValueError("bad script")
 
     def solve(self, **kwargs):
@@ -31,15 +33,20 @@ class ScriptPayToScript(ScriptType):
         """
         from . import script_obj_from_script
         p2sh_lookup = kwargs.get("p2sh_lookup")
+
         if p2sh_lookup is None:
             raise ValueError("p2sh_lookup not set")
+
         underlying_script = p2sh_lookup.get(self.hash160)
         if underlying_script is None:
             raise ValueError("underlying script cannot be determined for %s" % b2h(self.hash160))
+
         script_obj = script_obj_from_script(underlying_script)
         underlying_solution = script_obj.solve(**kwargs)
+
         if isinstance(underlying_solution, bytes):
             return underlying_solution + tools.bin_script([underlying_script])
+
         return underlying_solution[0] + tools.bin_script([underlying_script]), underlying_solution[1]
 
     def script(self):
@@ -48,13 +55,16 @@ class ScriptPayToScript(ScriptType):
             STANDARD_SCRIPT_OUT = "OP_HASH160 %s OP_EQUAL"
             script_text = STANDARD_SCRIPT_OUT % b2h(self.hash160)
             self._script = tools.compile(script_text)
+
         return self._script
 
     def address(self, netcode=None):
         from aiobitcoin.tools.networks import pay_to_script_prefix_for_netcode
         from aiobitcoin.tools.networks.default import get_current_netcode
+
         if netcode is None:
             netcode = get_current_netcode()
+
         address_prefix = pay_to_script_prefix_for_netcode(netcode)
         return encoding.hash160_sec_to_bitcoin_address(self.hash160, address_prefix=address_prefix)
 

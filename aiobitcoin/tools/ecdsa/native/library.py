@@ -34,7 +34,6 @@ def load_library():
         return None
 
     library = ctypes.CDLL(library_path)
-
     library.BignumType = bignum_type_for_library(library)
 
     BN_P = ctypes.POINTER(library.BignumType)
@@ -63,6 +62,7 @@ def load_library():
         ("EC_POINT_mul",
             [ctypes.c_void_p, ctypes.c_void_p, BN_P, ctypes.c_void_p, BN_P, BN_CTX], ctypes.c_int),
     ]
+
     set_api(library, BIGNUM_API)
     set_api(library, ECC_API)
     return library
@@ -89,6 +89,7 @@ def make_fast_mul_f(library):
         library.EC_POINT_free(ec_result)
         library.BN_CTX_free(ctx)
         return type(point)(point.curve(), bn_x.to_int(), bn_y.to_int())
+
     return fast_mul
 
 
@@ -99,6 +100,7 @@ def make_inverse_mod_f(library):
         library.BN_mod_inverse(a1, a1, library.BignumType(n), ctx)
         library.BN_CTX_free(ctx)
         return a1.to_int()
+
     return inverse_mod
 
 

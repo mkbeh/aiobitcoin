@@ -122,7 +122,6 @@ OPCODE_LIST = [
 ]
 
 OPCODE_TO_INT = dict(o for o in OPCODE_LIST)
-
 INT_TO_OPCODE = dict(reversed(i) for i in OPCODE_LIST)
 
 

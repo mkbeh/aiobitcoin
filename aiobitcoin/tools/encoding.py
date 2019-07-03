@@ -43,14 +43,18 @@ def to_long(base, lookup_f, s):
     """
     prefix = 0
     v = 0
+
     for c in s:
         v *= base
+
         try:
             v += lookup_f(c)
         except Exception:
             raise EncodingError("bad character %s in string %s" % (c, s))
+
         if v == 0:
             prefix += 1
+
     return v, prefix
 
 
@@ -69,8 +73,10 @@ def from_long(v, prefix, base, charset):
             l.append(charset(mod))
         except Exception:
             raise EncodingError("can't convert to character corresponding to %d" % mod)
+
     l.extend([charset(0)] * prefix)
     l.reverse()
+
     return bytes(l)
 
 
@@ -85,11 +91,13 @@ else:
         v = from_long(v, 0, 256, lambda x: x)
         if len(v) > 32:
             raise ValueError("input to to_bytes_32 is too large")
+
         return ((b'\0' * 32) + v)[-32:]
 
     def from_bytes_32(v):
         if len(v) > 32:
             raise OverflowError("int too big to convert")
+
         return to_long(256, byte2int, v)[0]
 
 
@@ -134,8 +142,10 @@ def a2b_hashed_base58(s):
     """
     data = a2b_base58(s)
     data, the_hash = data[:-4], data[-4:]
+
     if double_sha256(data)[:4] == the_hash:
         return data
+
     raise EncodingError("hashed base58 has bad checksum %s" % s)
 
 
@@ -145,6 +155,7 @@ def is_hashed_base58_valid(base58):
         a2b_hashed_base58(base58)
     except EncodingError:
         return False
+
     return True
 
 
@@ -155,6 +166,7 @@ def wif_to_tuple_of_prefix_secret_exponent_compressed(wif):
     decoded = a2b_hashed_base58(wif)
     actual_prefix, private_key = decoded[:1], decoded[1:]
     compressed = len(private_key) > 32
+
     return actual_prefix, from_bytes_32(private_key[:32]), compressed
 
 
@@ -166,8 +178,10 @@ def wif_to_tuple_of_secret_exponent_compressed(wif, allowable_wif_prefixes=None)
     Not that it matters, since we can use the secret exponent to generate both the compressed
     and uncompressed Bitcoin address."""
     actual_prefix, secret_exponent, is_compressed = wif_to_tuple_of_prefix_secret_exponent_compressed(wif)
+
     if allowable_wif_prefixes and actual_prefix not in allowable_wif_prefixes:
         raise EncodingError("unexpected first byte of WIF %s" % wif)
+
     return secret_exponent, is_compressed
 
 
@@ -182,6 +196,7 @@ def is_valid_wif(wif, allowable_wif_prefixes=[b'\x80']):
         wif_to_secret_exponent(wif, allowable_wif_prefixes=allowable_wif_prefixes)
     except EncodingError:
         return False
+
     return True
 
 
@@ -190,6 +205,7 @@ def secret_exponent_to_wif(secret_exp, compressed=True, wif_prefix=b'\x80'):
     d = wif_prefix + to_bytes_32(secret_exp)
     if compressed:
         d += b'\01'
+
     return b2a_hashed_base58(d)
 
 
@@ -199,6 +215,7 @@ def public_pair_to_sec(public_pair, compressed=True):
     x_str = to_bytes_32(public_pair[0])
     if compressed:
         return int2byte((2 + (public_pair[1] & 1))) + x_str
+
     y_str = to_bytes_32(public_pair[1])
     return b'\4' + x_str + y_str
 
@@ -207,10 +224,12 @@ def sec_to_public_pair(sec, strict=True):
     """Convert a public key in sec binary format to a public pair."""
     x = from_bytes_32(sec[1:33])
     sec0 = sec[:1]
+
     if len(sec) == 65:
         isok = sec0 == b'\4'
         if not strict:
             isok = isok or (sec0 in [b'\6', b'\7'])
+
         if isok:
             y = from_bytes_32(sec[33:65])
             return (x, y)
@@ -218,6 +237,7 @@ def sec_to_public_pair(sec, strict=True):
         if not strict or (sec0 in (b'\2', b'\3')):
             from .ecdsa import public_pair_for_x, generator_secp256k1
             return public_pair_for_x(generator_secp256k1, x, is_even=(sec0 == b'\2'))
+
     raise EncodingError("bad sec encoding for public key")
 
 
@@ -247,8 +267,10 @@ def bitcoin_address_to_hash160_sec_with_prefix(bitcoin_address):
     if len(blob) != 21:
         raise EncodingError("incorrect binary length (%d) for Bitcoin address %s" %
                             (len(blob), bitcoin_address))
+
     if blob[:1] not in [b'\x6f', b'\0']:
         raise EncodingError("incorrect first byte (%s) for Bitcoin address %s" % (blob[0], bitcoin_address))
+
     return blob[1:], blob[:1]
 
 
@@ -258,6 +280,7 @@ def bitcoin_address_to_hash160_sec(bitcoin_address, address_prefix=b'\0'):
     hash160, actual_prefix = bitcoin_address_to_hash160_sec_with_prefix(bitcoin_address)
     if (address_prefix == actual_prefix):
         return hash160
+
     raise EncodingError("Bitcoin address %s for wrong network" % bitcoin_address)
 
 
@@ -273,4 +296,5 @@ def is_valid_bitcoin_address(bitcoin_address, allowable_prefixes=b'\0'):
         hash160, prefix = bitcoin_address_to_hash160_sec_with_prefix(bitcoin_address)
     except EncodingError:
         return False
+
     return prefix in allowable_prefixes

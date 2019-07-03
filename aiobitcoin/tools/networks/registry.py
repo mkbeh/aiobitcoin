@@ -20,22 +20,28 @@ def register_network(network_info):
     """
     assert isinstance(network_info, Network)
     code = network_info.code
+
     if code in _NETWORK_NAME_LOOKUP:
         if _NETWORK_NAME_LOOKUP[code] == network_info:
             return
         raise ValueError("code %s already defined" % code)
+
     _NETWORK_NAME_LOOKUP[code] = network_info
     _NETWORK_CODES.append(code)
+
     for prop in "wif address pay_to_script prv32 pub32".split():
         v = getattr(network_info, prop, None)
         if v is not None:
             if v not in _NETWORK_PREFIXES:
                 _NETWORK_PREFIXES[v] = []
+
             _NETWORK_PREFIXES[v].append((code, prop))
+
     v = getattr(network_info, "bech32_hrp", None)
     if v is not None:
         if v not in _BECH32_PREFIXES:
             _BECH32_PREFIXES[v] = []
+
         _BECH32_PREFIXES[v].append(code)
 
 

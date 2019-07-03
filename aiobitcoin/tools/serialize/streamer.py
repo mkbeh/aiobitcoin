@@ -19,25 +19,31 @@ class Streamer(object):
     def parse_struct(self, fmt, f):
         l = []
         i = 0
+
         while i < len(fmt):
             c = fmt[i]
             if c == "[":
                 end = fmt.find("]", i)
                 if end < 0:
                     raise ValueError("no closing ] character")
+
                 subfmt = fmt[i+1:end]
                 count = self.array_count_parse_f(f)
                 array = []
+
                 for j in range(count):
                     if len(subfmt) == 1:
                         array.append(self.parse_struct(subfmt, f)[0])
                     else:
                         array.append(self.parse_struct(subfmt, f))
+
                 l.append(tuple(array))
                 i = end
             else:
                 l.append(self.parse_lookup[c](f))
+
             i += 1
+
         return tuple(l)
 
     def parse_as_dict(self, attribute_list, pack_list, f):
@@ -53,4 +59,5 @@ class Streamer(object):
     def pack_struct(self, fmt, *args):
         b = io.BytesIO()
         self.stream_struct(fmt, b, *args)
+
         return b.getvalue()

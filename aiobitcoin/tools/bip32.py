@@ -49,6 +49,7 @@ def xmprv_from_seed(seed: Octets, version: Octets, decode: bool = True) -> bytes
     # actual extended key (key + chain code) derivation
     if isinstance(seed, str):  # hex string
         seed = bytes.fromhex(seed)
+
     hd = HMAC(b"Bitcoin seed", seed, sha512).digest()
     mprv = int_from_octets(hd[:32])
     xmprv += hd[32:]                              # chain code

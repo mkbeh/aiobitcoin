@@ -37,7 +37,6 @@ def check_script(script_signature, script_public_key, signature_for_hash_type_f,
                  flags, expected_hash_type, traceback_f, witness, tx_sequence, tx_version):
     had_witness = False
     stack = Stack()
-
     is_p2h = is_pay_to_script_hash(script_public_key)
 
     if flags is None:
@@ -97,4 +96,5 @@ def verify_script(script_signature, script_public_key, signature_for_hash_type_f
             flags, expected_hash_type, traceback_f, witness, tx_sequence, tx_version)
     except ScriptError:
         return False
+
     return True

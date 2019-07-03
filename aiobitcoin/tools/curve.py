@@ -49,11 +49,12 @@ class Curve:
                 m = f"required security level ({t}) "
                 m += f"not in the allowed range {t_range}"
                 raise UserWarning(m)
+
             if plen < t * 2:
                 m = f"not enough bits ({plen}) for required security level {t}"
                 raise UserWarning(m)
-        self.t = t
 
+        self.t = t
         self.psize = (plen + 7) // 8
         # must be true to break simmetry using quadratic residue
         self.pIsThreeModFour = (p % 4 == 3)
@@ -62,6 +63,7 @@ class Curve:
         # 2. check that a and b are integers in the interval [0, p−1]
         if not 0 <= a < p:
             raise ValueError(f"invalid a ({hex(a)}) for given p ({hex(p)})")
+
         if not 0 <= b < p:
             raise ValueError(f"invalid b ({hex(b)}) for given p ({hex(p)})")
 
@@ -69,6 +71,7 @@ class Curve:
         d = 4 * a * a * a + 27 * b * b
         if d % p == 0:
             raise ValueError("zero discriminant")
+
         self._a = a
         self._b = b
 
@@ -76,20 +79,24 @@ class Curve:
         # 4. Check that yG^2 = xG^3 + a*xG + b (mod p).
         if len(G) != 2:
             raise ValueError("Generator must a be a tuple[int, int]")
+
         if not self.is_on_curve(G):
             raise ValueError("Generator is not on the 'x^3 + a*x + b' curve")
+
         self.G = Point(int(G[0]), int(G[1]))
         self.GJ = self.G[0], self.G[1], 1  # Jacobian coordinates
 
         # 5. Check that n is prime.
         if n < 2 or (n > 2 and not pow(2, n - 1, n) == 1):
             raise ValueError(f"n ({hex(n)}) is not prime")
+
         delta = int(2 * sqrt(p))
         # also check n with Hasse Theorem
         if h < 2:
             if not (p + 1 - delta <= n <= p + 1 + delta):
                 m = f"n ({hex(n)}) not in [p + 1 - delta, p + 1 + delta]"
                 raise ValueError(m)
+
         self.n = n
         self.nlen = n.bit_length()
         self.nsize = (self.nlen + 7) // 8
@@ -98,6 +105,7 @@ class Curve:
         exp_h = int(1 / n + delta / n + p / n)
         if h != exp_h:
             raise ValueError(f"h ({h}) not as expected ({exp_h})")
+
         assert t == 0 or h <= pow(2, t / 8), f"h ({h}) too big for t ({t})"
         self.h = h
 
@@ -107,6 +115,7 @@ class Curve:
         # as the above would be tautologically true
         InfMinusG = mult(self, n - 1, self.G)
         Inf = self.add(InfMinusG, self.G)
+
         if Inf[1] != 0:
             raise ValueError(f"n ({hex(n)}) is not the group order")
 
@@ -129,6 +138,7 @@ class Curve:
         result += f"\n n   = {hex(self.n)}"
         result += f"\n h = {self.h}"
         result += f"\n t = {self.t}"
+
         return result
 
     def __repr__(self) -> str:
@@ -139,6 +149,7 @@ class Curve:
         result += f", {hex(self.n)}"
         result += f", {self.h}"
         result += f", {self.t})"
+
         return result
 
     # methods using _p: they would become functions if _p goes public
@@ -161,6 +172,7 @@ class Curve:
             Z2 = Q[2] * Q[2]
             x = (Q[0] * mod_inv(Z2, self._p)) % self._p
             y = (Q[1] * mod_inv(Z2 * Q[2], self._p)) % self._p
+
             return Point(x, y)
 
     # methods using _a, _b, _p
@@ -182,6 +194,7 @@ class Curve:
 
         if Q[2] == 0:  # Infinity point in Jacobian coordinates
             return R
+
         if R[2] == 0:  # Infinity point in Jacobian coordinates
             return Q
 
@@ -189,6 +202,7 @@ class Curve:
         RZ3 = RZ2 * R[2]
         QZ2 = Q[2] * Q[2]
         QZ3 = QZ2 * Q[2]
+
         if Q[0] * RZ2 % self._p == R[0] * QZ2 % self._p:  # same affine x
             if Q[1] * RZ3 % self._p == R[1] * QZ3 % self._p:  # point doubling
                 QY2 = Q[1] * Q[1]
@@ -215,12 +229,14 @@ class Curve:
             X = (W * W - V3 - 2 * MV2) % self._p
             Y = (W * (MV2 - X) - T * V3) % self._p
             Z = (V * Q[2] * R[2]) % self._p
+
             return X, Y, Z
 
     def _add_aff(self, Q: Point, R: Point) -> Point:
         # points are assumed to be on curve
         if R[1] == 0:  # Infinity point in affine coordinates
             return Q
+
         if Q[1] == 0:  # Infinity point in affine coordinates
             return R
 
@@ -232,8 +248,10 @@ class Curve:
                 return Point()
         else:
             lam = ((R[1] - Q[1]) * mod_inv(R[0] - Q[0], self._p)) % self._p
+
         x = (lam * lam - Q[0] - R[0]) % self._p
         y = (lam * (Q[0] - x) - Q[1]) % self._p
+
         return Point(x, y)
 
     def _y2(self, x: int) -> int:
@@ -246,6 +264,7 @@ class Curve:
         """Return the y coordinate from x, as in (x, y)."""
         if not 0 <= x < self._p:
             raise ValueError(f"x-coordinate {hex(x)} not in [0, p-1]")
+
         y2 = self._y2(x)
         # mod_sqrt will raise a ValueError if root does not exist
         return mod_sqrt(y2, self._p)
@@ -259,10 +278,13 @@ class Curve:
         """Return True if the input point is on the curve."""
         if len(Q) != 2:
             raise ValueError("Point must be a tuple[int, int]")
+
         if Q[1] == 0:  # Infinity point in affine coordinates
             return True
+
         if not 0 < Q[1] < self._p:  # y cannot be zero
             raise ValueError(f"y-coordinate {hex(Q[1])} not in (0, p)")
+
         return self._y2(Q[0]) == (Q[1] * Q[1] % self._p)
 
     # break the y simmetry: even/odd, low/high, or quadratic residue criteria
@@ -271,6 +293,7 @@ class Curve:
         """Return the odd (even) y coordinate from x, as in (x, y)."""
         if odd1even0 not in (0, 1):
             raise ValueError("odd1even0 must be bool or 1/0")
+
         root = self.y(x)
         # switch even/odd root as needed (XORing the conditions)
         return root if root % 2 == odd1even0 else self._p - root
@@ -279,6 +302,7 @@ class Curve:
         """Return the low (high) y coordinate from x, as in (x, y)."""
         if low1high0 not in (0, 1):
             raise ValueError("low1high0 must be bool or 1/0")
+
         root = self.y(x)
         # switch low/high root as needed (XORing the conditions)
         return root if (self._p // 2 >= root) == low1high0 else self._p - root
@@ -287,11 +311,14 @@ class Curve:
         """Return the quadratic residue y from x, as in (x, y)."""
         if quad_res not in (0, 1):
             raise ValueError("quad_res must be bool or 1/0")
+
         if not self.pIsThreeModFour:
             raise ValueError("this method works only when p = 3 (mod 4)")
+
         root = self.y(x)
         # switch to quadratic residue root as needed
         legendre = legendre_symbol(root, self._p)
+
         return root if legendre == quad_res else self._p - root
 
 
@@ -302,12 +329,14 @@ def _mult_jac(ec: Curve, m: int, Q: _JacPoint) -> _JacPoint:
     m %= ec.n
     if m == 0 or Q[2] == 0:        # Infinity point in affine coordinates
         return 1, 1, 0             # return Infinity point
+
     R = 1, 1, 0                    # initialize as infinity point
     while m > 0:                   # use binary representation of m
         if m & 1:                  # if least significant bit is 1
             R = ec._add_jac(R, Q)  # then add current Q
         m = m >> 1                 # remove the bit just accounted for
         Q = ec._add_jac(Q, Q)      # double Q for next step
+
     return R
 
 

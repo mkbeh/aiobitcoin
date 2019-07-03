@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 import os
 import threading
 
@@ -14,8 +14,10 @@ def check_netcode(netcode):
 
 def _netcode_for_env():
     p = os.getenv("PYCOIN_DEFAULT_NETCODE")
+
     if p is None:
         p = 'BTC'
+
     check_netcode(p)
     return p
 

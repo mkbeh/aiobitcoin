@@ -79,6 +79,7 @@ class Spendable(TxOut):
         tx_out_index = int(tx_out_index_str)
         script = h2b(script_hex)
         coin_value = int(coin_value)
+
         return cls(coin_value, script, tx_hash, tx_out_index, int(block_index_available),
                    int(does_seem_spent), int(block_index_spent))
 

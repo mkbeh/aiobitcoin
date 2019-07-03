@@ -25,14 +25,17 @@ def _set_opcodes():
     count = 0
     cds = {}
     cds_rev = {}
+
     for opcode in _opcodes:
         if isinstance(opcode, tuple):
             var, count = opcode
         else:
             var = opcode
+
         cds.update({count: var})
         cds_rev.update({var: count})
         count += 1
+
     return cds, cds_rev
 
 
@@ -46,11 +49,12 @@ def opcode(name, as_bytes=True):
     :return int, bytes:
     """
     opcode_int = opcodes[name]
+
     if as_bytes:
         return struct.pack('B', opcode_int)
+
     return opcode_int
 
 
 opcodenames, opcodes = _set_opcodes()
-
 OP_N_CODES = range(opcodes['OP_1'], opcodes['OP_16'])

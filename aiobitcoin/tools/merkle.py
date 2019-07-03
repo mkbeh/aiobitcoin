@@ -34,6 +34,7 @@ def merkle(hashes, hash_f=double_sha256):
     """Take a list of hashes, and return the root merkle hash."""
     while len(hashes) > 1:
         hashes = merkle_pair(hashes, hash_f)
+
     return hashes[0]
 
 
@@ -42,9 +43,11 @@ def merkle_pair(hashes, hash_f):
     if len(hashes) % 2 == 1:
         hashes = list(hashes)
         hashes.append(hashes[-1])
+
     l = []
     for i in range(0, len(hashes), 2):
         l.append(hash_f(hashes[i] + hashes[i+1]))
+
     return l
 
 
