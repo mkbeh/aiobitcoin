@@ -31,7 +31,7 @@ ADDRESS = (MAINNET_ADDRESS, TESTNET_ADDRESS)
 # [45:78] key (private/public)
 
 
-def xmprv_from_seed(seed: Octets, version: Octets) -> bytes:
+def xmprv_from_seed(seed: Octets, version: Octets, decode: bool = True) -> bytes:
     """derive the master extended private key from the seed"""
 
     if isinstance(version, str):  # hex string
@@ -53,11 +53,12 @@ def xmprv_from_seed(seed: Octets, version: Octets) -> bytes:
     mprv = int_from_octets(hd[:32])
     xmprv += hd[32:]                              # chain code
     xmprv += b'\x00' + mprv.to_bytes(32, 'big')   # private key
+    xmprv = base58.encode_check(xmprv)
 
-    return base58.encode_check(xmprv)
+    return xmprv.decode('utf-8') if decode else xmprv
 
 
-def xpub_from_xprv(xprv: Octets) -> bytes:
+def xpub_from_xprv(xprv: Octets, decode: bool = True) -> bytes:
     """Neutered Derivation (ND)
 
     Computation of the extended public key corresponding to an extended
@@ -81,4 +82,6 @@ def xpub_from_xprv(xprv: Octets) -> bytes:
     p = int_from_octets(xprv[46:])
     P = mult(ec, p)
     xpub += octets_from_point(ec, P, True)          # public key
-    return base58.encode_check(xpub)
+    xpub = base58.encode_check(xpub)
+
+    return xpub.decode('utf-8') if decode else xpub
