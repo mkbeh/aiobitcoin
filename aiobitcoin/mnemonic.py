@@ -79,6 +79,8 @@ class Mnemonic:
         :type strength: int
         :param add_checksum: Included a checksum? Default is True
         :type add_checksum: bool
+        :param encoding
+        :type encoding: bool
 
         :return str: Mnemonic passphrase consisting of a space seperated list of words
         """
