@@ -1,4 +1,28 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (C) 2017-2019 The btclib developers 2019 mkbeh
+#
+# This file is part of btclib. It is subject to the license terms in the
+# LICENSE file found in the top-level directory of this distribution.
+#
+# No part of btclib including this file, may be copied, modified, propagated,
+# or distributed except according to the terms contained in the LICENSE file.
+
+"""BIP32 Hierarchical Deterministic Wallet functions.
+
+A deterministic wallet is a hash-chain of private/public key pairs that
+derives from a single root, which is the only element requiring backup.
+Moreover, there are schemes where public keys can be calculated without
+accessing private keys.
+
+A hierarchical deterministic wallet is a tree of multiple hash-chains,
+derived from a single root, allowing for selective sharing of keypair
+chains.
+
+Here, the HD wallet is implemented according to BIP32 bitcoin standard
+https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki.
+"""
+
 from hmac import HMAC
 from hashlib import sha512
 

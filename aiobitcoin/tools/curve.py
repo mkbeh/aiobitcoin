@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (C) 2017-2019 The btclib developers 2019 mkbeh
+#
+# This file is part of btclib. It is subject to the license terms in the
+# LICENSE file found in the top-level directory of this distribution.
+#
+# No part of btclib including this file, may be copied, modified, propagated,
+# or distributed except according to the terms contained in the LICENSE file.
+
+"""Elliptic curve class and functions."""
+
 from typing import NamedTuple, Tuple
 from math import sqrt
 from .numbertheory import mod_inv, mod_sqrt, legendre_symbol

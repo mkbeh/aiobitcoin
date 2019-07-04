@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (C) 2017-2019 The btclib developers 2019 mkbeh
+#
+# This file is part of btclib. It is subject to the license terms in the
+# LICENSE file found in the top-level directory of this distribution.
+#
+# No part of btclib including this file, may be copied, modified, propagated,
+# or distributed except according to the terms contained in the LICENSE file.
+
+"""Modular algebra functions.
+Implementations originally from
+https://en.wikibooks.org/wiki/Algorithm_Implementation/Mathematics/Extended_Euclidean_algorithm
+and
+https://codereview.stackexchange.com/questions/43210/tonelli-shanks-algorithm-implementation-of-prime-modular-square-root/43267
+with the following modifications:
+* type annotated python3
+* minor improvements
+* added extensive unit test
+"""
+
 from typing import Tuple
 
 

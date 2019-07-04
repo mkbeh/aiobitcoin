@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+# Copyright (C) 2017-2019 The btclib developers 2019 mkbeh
+#
+# This file is part of btclib. It is subject to the license terms in the
+# LICENSE file found in the top-level directory of this distribution.
+#
+# No part of btclib including this file, may be copied, modified, propagated,
+# or distributed except according to the terms contained in the LICENSE file.
+
 """Assorted conversion utilities.
 
 Most conversions from SEC 1 v.2 2.3 are included.

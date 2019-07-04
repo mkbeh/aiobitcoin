@@ -1,4 +1,32 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (C) 2017-2019 The btclib developers 2019 mkbeh
+#
+# This file is part of btclib. It is subject to the license terms in the
+# LICENSE file found in the top-level directory of this distribution.
+#
+# No part of btclib including this file, may be copied, modified, propagated,
+# or distributed except according to the terms contained in the LICENSE file.
+
+"""Base58 encoding and decoding functions.
+Binary-to-text encoding schemes are designed to transport binary data across
+channels that are designed to deal with textual data. In Bitcoin they are mostly
+used to represent large integers as alphanumeric text.
+Base58 is similar to Base64, which uses 10 digits, 26 lowercase characters,
+26 uppercase characters, '+' (plus sign), and '/' (forward slash).
+Base58 omits the similar-looking letters
+0 (zero), O (capital o), I (capital i), and l (lower case L)
+to avoid ambiguity when printed; moreover, it removes '+' and '/'
+so that a double-click does select the whole string.
+This implementation of Base58 and Base58Check is originally from
+https://github.com/keis/base58, with the following modifications:
+* type annotated python3
+* using native python3 int.from_bytes() and i.to_bytes()
+* added optional check on output size for decode() and decode_check()
+Input can be bytes or a string that will be encoded to bytes (after
+being stripped of leading/trailing white spaces)
+"""
+
 from typing import Union, Optional
 
 from .utils import double_sha256

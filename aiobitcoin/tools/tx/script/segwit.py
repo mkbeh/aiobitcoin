@@ -6,6 +6,7 @@ Parse, stream, create, sign and verify Bitcoin transactions as Tx structures.
 The MIT License (MIT)
 
 Copyright (c) 2017 by Richard Kiss
+Copyright (c) 2019 July by mkbeh
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
