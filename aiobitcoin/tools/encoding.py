@@ -47,15 +47,7 @@ def ripemd160(data):
     return hashlib.new("ripemd160", data)
 
 
-try:
-    ripemd160(b'').digest()
-except Exception:
-    # stupid Google App Engine hashlib doesn't support ripemd160 for some stupid reason
-    # import it from pycrypto. You need to add
-    # - name: pycrypto
-    #   version: "latest"
-    # to the "libraries" section of your app.yaml
-    from Crypto.Hash.RIPEMD import RIPEMD160Hash as ripemd160
+ripemd160(b'').digest()
 
 
 def to_long(base, lookup_f, s):
