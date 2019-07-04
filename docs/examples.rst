@@ -1,6 +1,9 @@
 Examples
 --------
 
+JSON-RPC interaction
+~~~~~~~~~~~~~~~~~~~~
+
 **Basic usage:**
 ::
 
@@ -187,3 +190,93 @@ asynchronously using `GramBitcoin`**
 
         # Close sessions.
         [await gram.close_session() for gram in grams]
+
+
+Mnemonic phrase generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    from aiobitcoin.mnemonic import Mnemonic
+    ceed = Mnemonic().generate(encoding=False)
+
+    # ... Output: rebel swear tomorrow burger cave giraffe ...
+
+
+bip32
+~~~~~
+
+**Getting master private key from mnemonic phrase:**
+::
+
+    from aiobitcoin.tools import bip32
+    from aiobitcoin.tools.bip32 import MAINNET_PRV, TESTNET_PRV
+
+
+    testnet_mxpriv = bip32.xmprv_from_seed(ceed, TESTNET_PRV)
+    # ... Output: tprv8ZgxMBicQKsPe6tqMpq6qyzFoFSr3cgh...
+
+    mainnet_mxpriv = bip32.xmprv_from_seed(ceed, MAINNET_PRV)
+    # ... Output: xprv9s21ZrQH143K4Q9MazKYy5Kuck31yFeT...
+
+
+**Getting master public key from master private key:**
+::
+
+    from aiobitcoin.tools import bip32
+
+    testnet_mxpub = bip32.xpub_from_xprv(testnet_mxpriv)
+    mainnet_mxpub = bip32.xpub_from_xprv(mainnet_mxpriv)
+
+    # ... Output: tpubD6NzVbkrYhZ4X5ghC8mzzsGuMQCxEmnh5Y...
+    # ... Output: xpub661MyMwAqRbcFHVqjwnunwwY2H7JFPHdXv...
+
+Key tool interaction
+~~~~~~~~~~~~~~~~~~~~
+
+**Key tool basic usage:**
+::
+
+    from aiobitcoin.tools.key.Key import Key
+
+    key = Key.from_text(mainnet_mxpriv)
+
+    wif = key.wif()
+    # ... Output: L4PEssMfRgHvmpyEGxHJkFVcNWeQvZiySNMAa...
+
+    addr = key.address()
+    # ... Output: 1BGLari4SCxGXoJib27C8pAL6Ef3pFqswD
+
+    child_index = key.child_index()
+    # ... Output: 0
+
+    mxpub = key.hwif()
+    # ... Output: xpub661MyMwAqRbcFi4Mh1uhDohwNygiiNuf2C...
+
+    hex_mpriv = key.sec_as_hex()
+    # ... Output: 02d823155a8336b2eb3bfc5536199aec11993e...
+
+    sec_mpriv = key.sec()
+    # ... Output: b'\x02\xd8#\x15Z\x836\xb2\xeb;\xfcU6\x...'
+
+    tree_depth = key.tree_depth()
+    # ... Output: 0
+
+
+**Creating sub keys by custom derivation path:**
+::
+
+    subkey = key.subkey_for_path('1/0/{}'.format(11))
+
+    addr = subkey.address(use_uncompressed=False)
+    wif = subkey.wif()
+    child_index = subkey.child_index()
+    tree_depth = subkey.tree_depth()
+
+    # ... addr: 1KgUQ9GFrQRh2fLX2WfXPdipKsTSDyZeqr
+    # ... wif: KzRLKBHTNo15FFnQNE4d5iniK85EgDqBaaM4FURme5LmMiYk7nhz
+    # ... child_index: 11
+    # ... tree_depth: 3
+
+
+.. note::
+    The addresses and WIF keys obtained by the above methods can be easily imported into the Bitcoin Core.

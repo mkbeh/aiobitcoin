@@ -1,6 +1,11 @@
 Installation
 ------------
 
+**Linux requirements:**
+::
+    sudo apt install python-dev python3-dev
+    sudo apt install libssl-dev
+
 **Install with pip:**
 ::
 
