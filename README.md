@@ -96,7 +96,6 @@ pip3 install aiobitcoin
 
     # ... Output: rebel swear tomorrow burger cave giraffe ...
 
-
     # -- Generate master keys from ceed for BTC mainnet and testnet --
     testnet_mxpriv = bip32.xmprv_from_seed(ceed, TESTNET_PRV)
     # ... Output: tprv8ZgxMBicQKsPe6tqMpq6qyzFoFSr3cgh...
