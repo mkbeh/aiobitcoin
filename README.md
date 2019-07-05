@@ -5,8 +5,17 @@
 [![Documentation Status](https://readthedocs.org/projects/aiobitcoin/badge/?version=latest)](http://aiobitcoin.readthedocs.io/?badge=latest)
 [![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://GitHub.com/Naereen/StrapDown.js/issues/)
 
-This is a simple library that provides methods for working 
+This is a library that provides methods for working 
 with Bitcoin/forks daemon JSON-RPC.
+
+Also there are tools for working with bip32 hierarchical 
+deterministic wallets in this library . These tools were taken 
+from three different libraries such as 
+[bitcoinlib](https://github.com/1200wd/bitcoinlib), 
+[btclib](https://github.com/fametrano/btclib) and
+[pycoin](https://github.com/richardkiss/pycoin) ,
+because I had problems while importing keys and addresses 
+to the Bitcoin Core when working with each of them separately.
 
 [Examples](https://aiobitcoin.readthedocs.io/en/latest/examples.html)
 
@@ -24,6 +33,12 @@ Bitshares account -> mkbehforever007
 bitcoin -> bc1qqkr72aemz59aawxf74gytrwuw4m9mj20t7e7df
 ethereum -> 0xB3e5b643cFB9e2565a3456eC7c7A73491A32e31F
 ```
+
+## Supports
+* **Basic methods for asynchronous work with Bitcoin/forks
+JSON-RPC**
+* **Mnemonic key generation**
+* **BIP32 hierarchical deterministic wallets**
 
 ## Installation
 ```bash
@@ -111,3 +126,8 @@ pip3 install aiobitcoin
     addr = subkey.address(use_uncompressed=False)
     wif = subkey.wif()
 ```
+
+## Roadmap
+* Add all available methods to work with Bitcoin/forks JSON-RPC
+* Rewrite to async `Key` tool
+* Add DASH, LTC supporting
