@@ -42,6 +42,8 @@ JSON-RPC**
 
 ## Installation
 ```bash
+sudo apt install python-dev python3-dev
+sudo apt install libssl-dev
 pip3 install aiobitcoin
 ```
 
