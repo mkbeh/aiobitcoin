@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='aiobitcoin',
-    version='0.74.13',
+    version='0.75.13',
     description='Bitcoin lib for working with Bitcoin RPC.',
     author='mkbeh',
     author_email='mkbehforever@gmail.com',
