@@ -47,7 +47,7 @@ pip3 install aiobitcoin
 
 ## Quickstart
 **Simple usage:**
-
+```python
     import asyncio
     from aiobitcoin.blockchain import Blockchain
 
@@ -62,9 +62,10 @@ pip3 install aiobitcoin
 
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(foo())
+```
 
 **or use the same with context manager:**
-
+```python
     import asyncio
     from aiobitcoin.blockchain import Blockchain
 
@@ -79,6 +80,7 @@ pip3 install aiobitcoin
 
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(foo())
+```
     
 
 **Working with bip32**
