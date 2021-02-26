@@ -14,7 +14,7 @@ setup(
     url='https://github.com/mkbeh/aiobitcoin',
     license='MIT',
     install_requires=[
-        'aiohttp==3.5.4',
+        'aiohttp==3.7.4',
         'async-timeout==3.0.1',
         'attrs==19.1.0',
         'chardet==3.0.4',
