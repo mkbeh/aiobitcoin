@@ -22,7 +22,7 @@ setup(
         'idna-ssl==1.1.0',
         'multidict==4.5.2',
         'typing-extensions==3.7.2',
-        'ujson==1.35',
+        'ujson==5.2.0',
         'yarl==1.3.0',
     ],
     packages=find_packages()
